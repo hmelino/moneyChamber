@@ -2,17 +2,15 @@ import datetime
 import time
 import re
 import json
-import vuke
-from vuke import *
-dejta = vuke.demData
+
 #boughtDate=datetime.strftime("2019-04-29","%Y-%m-%d")
 #boughtDaate=datetime.datetime.strptime(str(2019-04-29),'%Y-%m-%d')
 boughDate=datetime.datetime.strptime("2019.04.29","%Y.%m.%d").date()
 
-arrayOfArrays =[]
-dateArray = []
-divArrayAmount = []
-divArrayDate = []
+#arrayOfArrays =[]
+#dateArray = []
+#divArrayAmount = []
+#divArrayDate = []
 
 startDateofArray = datetime.date(2019,2,5)
 startWeekIndex= startDateofArray.weekday()
@@ -22,6 +20,11 @@ startWeekIndex= startDateofArray.weekday()
 
 
 def historyPrices (boughtAt,downloadedData):
+	dateArray=[]
+	if 'Note' in downloadedData:
+		print("wrong data")
+		print(downloadedData)
+	else:pass
 	datenow = datetime.date.today()
 	beforeBuyDays = (datenow-startDateofArray).days
 	howManyDays=(datenow-boughtAt).days
@@ -34,7 +37,11 @@ def historyPrices (boughtAt,downloadedData):
 		else: 
 			dateArray.append(0)
 			pass
+			
+	
+			
 	return dateArray
+	 
 	
 	
 		
@@ -57,5 +64,4 @@ def updateBankHolidayDays(array):
 		else:
 			indexNum=indexNum+1
 	return array
-
 

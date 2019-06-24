@@ -5,6 +5,8 @@ from emailData import *
 etfArray=["VMID","VUKE"]
 myArray=[]
 
+		
+
 def etfCheck():
 	for n in range(len(myArray)):
 		for i in range(len(etfArray)):
@@ -26,14 +28,17 @@ def createStockClass():
 			self.etf=etf
 
 	data = emailData.demData
-	i = 1
-	for n in range(int(len(data)/12-1)):
+	i = 0
+	for n in range(int(len(data)/12)):
+		
 		#data format
 		dateM=data[1+i].split(" ")[0]
 		demm=datetime.datetime.strptime(str(dateM),"%Y.%m.%d").date()
 		myArray.append(Stock(data[4+i],data[3+i],demm,0,data[5+i],False))
+		#print(data[4+i],data[3+i],demm,0,data[5+i],False)
 		
 		i=i+12
+		
 	etfCheck()
 	return myArray
 	
