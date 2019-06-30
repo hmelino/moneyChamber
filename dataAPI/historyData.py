@@ -3,14 +3,10 @@ import time
 import re
 import json
 
-#boughtDate=datetime.strftime("2019-04-29","%Y-%m-%d")
-#boughtDaate=datetime.datetime.strptime(str(2019-04-29),'%Y-%m-%d')
+
 boughDate=datetime.datetime.strptime("2019.04.29","%Y.%m.%d").date()
 
-#arrayOfArrays =[]
-#dateArray = []
-#divArrayAmount = []
-#divArrayDate = []
+
 
 startDateofArray = datetime.date(2019,2,5)
 startWeekIndex= startDateofArray.weekday()
@@ -21,6 +17,7 @@ startWeekIndex= startDateofArray.weekday()
 
 def historyPrices (boughtAt,downloadedData):
 	dateArray=[]
+	dateDic={}
 	if 'Note' in downloadedData:
 		print("wrong data")
 		print(downloadedData)
@@ -29,18 +26,19 @@ def historyPrices (boughtAt,downloadedData):
 	beforeBuyDays = (datenow-startDateofArray).days
 	howManyDays=(datenow-boughtAt).days
 	print(str(howManyDays)+" days between today and stock bought")
-	for n in range(howManyDays):
+	for n in range(howManyDays+1):
 		duj = datetime.timedelta(1-n)
-		pastDate = str(boughtAt-duj)
-		if pastDate in downloadedData['Time Series (Daily)']:
-			dateArray.append(downloadedData['Time Series (Daily)'][str(pastDate)]['4. close'])
+		#pastDate = str(boughtAt-duj)
+		pastDateV2 = (boughtAt-duj)
+		if pastDateV2 in downloadedData['Time Series (Daily)']:
+			dateDic[pastDateV2]=downloadedData['Time Series (Daily)'][str(pastDateV2)]['4. close']
+			print("added entry")
+			#dateArray.append(downloadedData['Time Series (Daily)'][str(pastDate)]['4. close'])
 		else: 
-			dateArray.append(0)
+			#dateArray.append(0)
+			dateDic[pastDateV2]=0
 			pass
-			
-	
-			
-	return dateArray
+	return dateDic
 	 
 	
 	

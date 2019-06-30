@@ -19,13 +19,17 @@ def etfCheck():
 def createStockClass():
 	#create Class
 	class Stock (object):
-		def __init__(self,ticker,amount,date,arrej,price,etf):
+		def __init__(self,ticker,amount,date,arrej,price,etf,historyDic):
 			self.ticker = ticker
 			self.amount = amount
 			self.date = date
 			self.arrej=arrej
 			self.price=price
 			self.etf=etf
+			self.historyDic=historyDic
+
+			
+			
 
 	data = emailData.demData
 	i = 0
@@ -34,7 +38,7 @@ def createStockClass():
 		#data format
 		dateM=data[1+i].split(" ")[0]
 		demm=datetime.datetime.strptime(str(dateM),"%Y.%m.%d").date()
-		myArray.append(Stock(data[4+i],data[3+i],demm,0,data[5+i],False))
+		myArray.append(Stock(data[4+i],data[3+i],demm,0,data[5+i],False,{}))
 		#print(data[4+i],data[3+i],demm,0,data[5+i],False)
 		
 		i=i+12

@@ -31,11 +31,6 @@ def priceCheck(dateArray):
 			pass
 		else:
 			data=float(dateArray[n+1])/float(dateArray[n])
-			#print("________")
-			#print("n1 = "+str(dateArray[n]))
-			#print("n2 = "+str(dateArray[n+1]))
-			#print("/ = "+str(data))
-			#print("func "+str(dateArray[n+1])+" / "+str(dateArray[n+1]))
 			if data < magNum:
 				print(data)
 				print("Price Anomaly")
@@ -54,6 +49,11 @@ def createSumFloatArray(dezArray):
 	return totalArray
 
 
+	
+	
+
+
+
 
 #find start date of portfolio
 def startDate(mainArray):
@@ -63,6 +63,7 @@ def startDate(mainArray):
 	oldest=(sorted(oldDateArray))
 	return oldest[0]
 #fill array with zeros before buy
+
 def beforeBuyDays(oldestDay,boughtAt,dateArray):
 	beforeBuy=abs((oldestDay-boughtAt).days)
 	for n in range(beforeBuy):
