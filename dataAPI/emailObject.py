@@ -19,11 +19,11 @@ def etfCheck():
 def createStockClass():
 	#create Class
 	class Stock (object):
-		def __init__(self,ticker,amount,date,arrej,price,etf,historyDic):
+		def __init__(self,ticker,amount,date,transactionDic,price,etf,historyDic):
 			self.ticker = ticker
 			self.amount = amount
 			self.date = date
-			self.arrej=arrej
+			self.transactionDic=transactionDic
 			self.price=price
 			self.etf=etf
 			self.historyDic=historyDic

@@ -13,165 +13,116 @@ import datetime
 import operator
 import matplotlib
 import matplotlib.pyplot as plt
+import buyInfoParse
+from buyInfoParse import *
+import dividendInfo
+from dividendInfo import *
 
 
 vuki={'2019-06-25':7,'2019-05-14':5,'2019-05-09':2,'2019-05-08':3,'2019-04-29':2}
 
-def createPreviousBasePrice(historyDic,selectedStock):
-	basePrice=float(mainStockArray[selectedStock].price)
-	lenOfBuys=int((len(vuki)))
-	for n in historyDic:
-		previousDay=n-datetime.timedelta(1)
-		price=historyDic[n][0]
-		amount=int(historyDic[n][1])
-		#how many times bough this stock
-		if str(n) in vuki and lenOfBuys>1:
-		  m = basePrice*amount
-		  o = amount-(historyDic[previousDay][1])
-		  l = (float(historyDic[n][0])/100)*o
-		  k =m-l
-		  basePrice=round(k/historyDic[previousDay][1],2)
-		  historyDic[n][2]=basePrice
-		  historyDic.update
-		  # to protect from out of range 
-		  lenOfBuys=lenOfBuys-1
-		else:
-		  historyDic[n][2]=basePrice
-	
-		  
-				
-				  
-		
-
-
-
 
 start = time.time()
 def createData(selectedStock):
-	stockTicker=mainStockArray[selectedStock].ticker
-	#oldest day of buy
-	oldestDay=functionsLibrary.startDate(mainStockArray)
-	firstDay=mainStockArray[selectedStock].date
-	
-	#dowload all stock data avaiable
-	jsonData=downloadData.oneTimeConnection(stockTicker)
-	# define date now
-	dateNow=datetime.datetime.today().date()
-	
-	howManyDays=(dateNow-firstDay)
-	
-	ownershipPeriod=howManyDays.days
-	
-	# create countable unit of 1 day
-	oneDay=datetime.timedelta(1)
-	
-	print("You held "+str(stockTicker)+"for "+str(ownershipPeriod)+" days")
-	
-	#count total Amount owning by today 
-	totalAmountToday=0
-	for n in vuki.values():
-		totalAmountToday=totalAmountToday+int(n)
-	amount=totalAmountToday
-	
-	
-	stockTotalTotal=totalAmountToday*mainStockArray[selectedStock].price
-	
-	
-	priceDic={}
-	
-	
-	# create dic of prices based on how long I owned them
-	#demDate[date]=price 
-	priceDicValue=0
-	boughtAt=0
-	for n in range(int(ownershipPeriod)+1):
-		demDate = dateNow-datetime.timedelta(n)
-		if str(demDate) in jsonData['Time Series (Daily)']:
-		  priceDicValue = float(jsonData['Time Series (Daily)'][str(demDate)]['4. close'])
-		  priceDic[demDate]=priceDicValue
-		  if demDate in vuki:
-		    firstlart=float(vuki[demDate])/totalAmountToday
-		else:
-			#if date doesnt exist, put previous value
-			priceDic[demDate]=priceDicValue
-	
-	#fix first 1 or 2 days with 0 prices
-	for n in priceDic:
-	  if priceDic[n]!=0 and priceDic[n+oneDay]==0:
-	    if priceDic[n+oneDay*2]==0:
-	      priceDic[n+oneDay*2]=priceDic[n]
-	      priceDic[n+oneDay]=priceDic[n]
-	    else:priceDic[n+oneDay]=priceDic[n]
-	
-	
+  transactionDic=mainStockArray[selectedStock].transactionDic
+  stockTicker=mainStockArray[selectedStock].ticker
+  
+  
+  
+  firstDay=mainStockArray[selectedStock].date
+  
+  
+  #dowload all stock data avaiable
+  jsonData=downloadData.oneTimeConnection(stockTicker)
+  
 
-	
-	
-#create floatDic from priceDic
-	floatDic={}
-	boughtAt = mainStockArray[selectedStock].price
-	boughtWhen = mainStockArray[selectedStock].date
-	
-	
-		
-	
-	for n in priceDic:
-		if str(n) in vuki:
-			amount=amount-int((vuki[str(n)]))
-			floatDic[n]=((priceDic[n]-float(boughtAt))*float(amount))/100
-		else:
-			floatDic[n]=((priceDic[n]-float(boughtAt))*float(amount))/100
-	
-	#create history dictionary
-	historyDic={}
-	amount = totalAmountToday
-	baseprice=mainStockArray[selectedStock].price
-	
-	for n in priceDic:
-		if str(n) in vuki:
-			historyDic[n]=[float(priceDic[n]),int(amount),float(baseprice)]
-			amount=amount-vuki[str(n)]
-			
+  # define date now
+  dateNow=datetime.datetime.today().date()
+  
+  howManyDays=(dateNow-firstDay)
+  
+  ownershipPeriod=howManyDays.days
+  
+  # create countable unit of 1 day
+  oneDay=datetime.timedelta(1)
+  
+  print("You held "+str(stockTicker)+"for "+str(ownershipPeriod)+" days")
+  
+  
+  
+  #count total Amount owning by today 
+  totalAmountToday=0
+  for n in transactionDic.values():
+    totalAmountToday=totalAmountToday+int(n)
+  amount=totalAmountToday
+  
+  stockTotalTotal=totalAmountToday*mainStockArray[selectedStock].price
+  
+  priceDic=functionsLibrary.createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic)
+  
+  
+  priceDic=functionsLibrary.fixZeroPriceDay(priceDic,oneDay)
+  priceDic=functionsLibrary.fixPriceAnomalies(mainStockArray,priceDic,selectedStock)
+  
+  historyDic=functionsLibrary.createHistoryDic(totalAmountToday,mainStockArray,selectedStock,priceDic)
+  # update previous base prices in History Dictionary
+  historyDic=functionsLibrary.createPreviousBasePrice(historyDic,selectedStock,mainStockArray)
+  
+  
+  #countFloats
 
-		else:
-			historyDic[n]=[float(priceDic[n]),int(amount),float(baseprice)]
-		
-	
-				
-				
-			
-	createPreviousBasePrice(historyDic,selectedStock)
+  dateArray=functionsLibrary.dateArray(mainStockArray)
 
-	
-	
-	#turn dictionary into array 
-	floatArray=[]
-	for n in floatDic.values():
-		floatArray.append(float(n)/100)
-		
-	#save dictiinary to mainArray
-	mainStockArray[selectedStock].arrej=floatDic
-	
-	#create graph
-	plt.plot(floatArray)
-	plt.axhline(0, color='lightseagreen')
-	plt.show()
-	
-	
-	print(floatDic)
-	return floatDic
+  # create floatArray from floatDic
+  floatArray=functionsLibrary.floatArrayFromDic(historyDic,dateArray)
+  
+  
+  
+  #save dictiinary to mainArray
+  #mainStockArray[selectedStock].arrej=floatDic
+  
+  #create graph
+  #plt.plot(floatArray)
+  #plt.axhline(0, color='lightseagreen')
+  #plt.show()
+  
+  return floatArray
 	
 	
 	
-	
-
-
-dezArray=[]
+############################ start of program
+dividendInfo=
+buyInfo=buyInfoParse.parseBuyInfo()
 mainStockArray=emailObject.createStockClass()
-createData(0)
+dictionary={}
+for n in range(len(buyInfo)):
+  mainStockArray[n].transactionDic=buyInfo[n]
+
+
+mainStockArray=functionsLibrary.multipyETFprice(mainStockArray)
+dateArray=functionsLibrary.dateArray(mainStockArray)
+floatArray=[]
+for n in range(14):
+  o=createData(n)
+  floatArray.append(o)
+
+zfloat=[]
+for day in range(len(floatArray[0])):
+  data=0
+  for array in floatArray:
+    data=float(array[day])+data
+  zfloat.append(data)
+
+
+plt.plot(zfloat)
+plt.axhline(0, color='lightseagreen')
+plt.show()
+
 
 end = time.time()
 print(end-start)
+
+
 
 
 		
