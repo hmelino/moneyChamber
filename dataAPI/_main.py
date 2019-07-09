@@ -17,94 +17,66 @@ import buyInfoParse
 from buyInfoParse import *
 import dividendInfo
 from dividendInfo import *
+import buyInfo 
+from buyInfo import *
+import sys 
+import offlineData
+from offlineData import *
+import createStockData
+from createStockData import *
 
-
-vuki={'2019-06-25':7,'2019-05-14':5,'2019-05-09':2,'2019-05-08':3,'2019-04-29':2}
 
 
 start = time.time()
-def createData(selectedStock):
-  transactionDic=mainStockArray[selectedStock].transactionDic
-  stockTicker=mainStockArray[selectedStock].ticker
-  
-  
-  
-  firstDay=mainStockArray[selectedStock].date
-  
-  
-  #dowload all stock data avaiable
-  jsonData=downloadData.oneTimeConnection(stockTicker)
-  
-
-  # define date now
-  dateNow=datetime.datetime.today().date()
-  
-  howManyDays=(dateNow-firstDay)
-  
-  ownershipPeriod=howManyDays.days
-  
-  # create countable unit of 1 day
-  oneDay=datetime.timedelta(1)
-  
-  print("You held "+str(stockTicker)+"for "+str(ownershipPeriod)+" days")
-  
-  
-  
-  #count total Amount owning by today 
-  totalAmountToday=0
-  for n in transactionDic.values():
-    totalAmountToday=totalAmountToday+int(n)
-  amount=totalAmountToday
-  
-  stockTotalTotal=totalAmountToday*mainStockArray[selectedStock].price
-  
-  priceDic=functionsLibrary.createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic)
-  
-  
-  priceDic=functionsLibrary.fixZeroPriceDay(priceDic,oneDay)
-  priceDic=functionsLibrary.fixPriceAnomalies(mainStockArray,priceDic,selectedStock)
-  
-  historyDic=functionsLibrary.createHistoryDic(totalAmountToday,mainStockArray,selectedStock,priceDic)
-  # update previous base prices in History Dictionary
-  historyDic=functionsLibrary.createPreviousBasePrice(historyDic,selectedStock,mainStockArray)
-  
-  
-  #countFloats
-
-  dateArray=functionsLibrary.dateArray(mainStockArray)
-
-  # create floatArray from floatDic
-  floatArray=functionsLibrary.floatArrayFromDic(historyDic,dateArray)
-  
-  
-  
-  #save dictiinary to mainArray
-  #mainStockArray[selectedStock].arrej=floatDic
-  
-  #create graph
-  #plt.plot(floatArray)
-  #plt.axhline(0, color='lightseagreen')
-  #plt.show()
-  
-  return floatArray
 	
-	
-	
-############################ start of program
-dividendInfo=
-buyInfo=buyInfoParse.parseBuyInfo()
-mainStockArray=emailObject.createStockClass()
+############################################################################################################################################         start of program
+
+#check is MainStockArray is saved
+mainStockArray=functionsLibrary.isMainStockArraySaved()
+  
+#check date of saved Data
+functionsLibrary.checkDateOfSavedData(mainStockArray)
+  
+ 
+#Process mainStockArray
+buyInfo=buyInfoParse.parseBuyInfo(mainStockArray)
 dictionary={}
 for n in range(len(buyInfo)):
   mainStockArray[n].transactionDic=buyInfo[n]
-
-
 mainStockArray=functionsLibrary.multipyETFprice(mainStockArray)
 dateArray=functionsLibrary.dateArray(mainStockArray)
+mainStockArray=buyInfoParse.parseDividendInfo(mainStockArray)
 floatArray=[]
-for n in range(14):
-  o=createData(n)
-  floatArray.append(o)
+
+
+
+#check if floatArray exist
+
+try:
+  pickle_floatArray=open("pickle/floatArray.pickle","rb")
+  floatArray=pickle.load(pickle_floatArray)
+  pickle_floatArray.close()
+  print("Found saved floatArray")
+except :
+  print("floatArray is not created yet")
+  for n in range(14):
+    o=createStockData.createData(n,mainStockArray)
+    floatArray.append(o)
+    
+  print("Downloaded and processed all data")
+  print("Creaed float Array")
+  
+  pickle_floatArrayOut=open("pickle/floatArray.pickle","wb")
+  pickle.dump(floatArray,pickle_floatArrayOut)
+  pickle_floatArrayOut.close()
+  print("Saved Float Data")
+  #end
+
+
+
+  
+
+
 
 zfloat=[]
 for day in range(len(floatArray[0])):
@@ -117,6 +89,24 @@ for day in range(len(floatArray[0])):
 plt.plot(zfloat)
 plt.axhline(0, color='lightseagreen')
 plt.show()
+
+functionsLibrary.saveMainStockArray(mainStockArray)
+
+
+namesArray=[]
+
+for n in range(len(mainStockArray)):
+  namesArray.append(mainStockArray[n].ticker)
+print(namesArray)
+
+
+  
+
+
+
+
+
+
 
 
 end = time.time()

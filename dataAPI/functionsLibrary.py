@@ -1,5 +1,7 @@
 import datetime
-
+import pickle
+import emailObject
+from emailObject import *
 def dateArray(mainStockArray):
   oldDateArray=[]
   for n in range(len(mainStockArray)-1):
@@ -130,10 +132,10 @@ def createHistoryDic(totalAmountToday,mainStockArray,selectedStock,priceDic):
   
   for n in priceDic:
     if str(n) in transactionDic:
-      historyDic[n]=[float(priceDic[n]),int(amount),float(baseprice)]
+      historyDic[n]=[float(priceDic[n]),int(amount),float(baseprice),0]
       amount=amount-transactionDic[str(n)]
     else:
-      historyDic[n]=[float(priceDic[n]),int(amount),float(baseprice)]
+      historyDic[n]=[float(priceDic[n]),int(amount),float(baseprice),0]
   return historyDic
 		
 					
@@ -194,8 +196,35 @@ def floatArrayFromDic(historyDic,dateArray):
 	    else:
 	      floatArray.append(0)
 	  return floatArray[::-1]
+	  
+#save MainStockArray
+def saveMainStockArray(mainStockArray):
+  pickle_MainStockArrayOut=open("pickle/MainStockArray.pickle","wb")
+  pickle.dump(mainStockArray,pickle_MainStockArrayOut)
+  pickle_MainStockArrayOut.close()
+  print("Saved MainStockArray pickle")
 	      
-	    
+# check if MainStockArray exists
+def isMainStockArraySaved():
+  try:
+    pickle_MainStockArray=open("pickle/MainStockArray.pickle","rb")
+    mainStockArray=pickle.load(pickle_MainStockArray)
+    pickle_MainStockArray.close()
+    print("Found MainStockArray file")
+  except :
+    print("MainStockArray is not created yet")
+    mainStockArray=emailObject.createStockClass()
+    print("----Created New Main Stock Array----")
+  return mainStockArray
+  
+  
+
+def checkDateOfSavedData(mainStockArray):
+  if mainStockArray[0].timeStamp==datetime.date.today():
+    print("Your saved data are up to date")
+  else:
+    print("Saved data are old")
+    print(mainStockArray[0].timeStamp)
 	    
 
 
