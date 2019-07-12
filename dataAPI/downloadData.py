@@ -26,7 +26,7 @@ def oneTimeConnection(nameOfStock):
     nameOfStock=stocksDic[nameOfStock]
   else:
     nameOfStock=nameOfStock+str('.LON')
-  link = firstHalf+nameOfStock+lastBit+apiKeys[0]
+  link = firstHalf+nameOfStock+lastBit+apiKeys[3]
   
   try:
     res = requests.get(link).json()

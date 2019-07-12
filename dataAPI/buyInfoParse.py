@@ -32,7 +32,7 @@ def parseDividendInfo(mainStockArray):
   i=m.readlines()
   
   for n in range(len(i)):
-    print("------")
+    #print("------")
     p=i[n]
     #VOD={'2018-11-28':1.27}
     
@@ -40,16 +40,16 @@ def parseDividendInfo(mainStockArray):
     s=re.split("'",r)
     #['VOD', '2018-11-28', '1.27']
     
-    print('s='+str(s))
+    #print('s='+str(s))
     howManyDivs=int((len(s)-1)/2)
-    print('how many divs ='+str(howManyDivs))
+    #print('how many divs ='+str(howManyDivs))
     
     
     divTotal=0
     #for o in range(int(howManyDivs)):
     lowerDateProtection=datetime.datetime(1,1,1).date()
     for o in range(howManyDivs):
-      print('o='+str(o))
+      #print('o='+str(o))
       divName = s[0]
       divDate=datetime.datetime.strptime(s[1+(o*2)],'%Y-%m-%d').date()
       divValue = float(s[2+(o*2)])
@@ -64,7 +64,7 @@ def parseDividendInfo(mainStockArray):
               if z == divDate:
                 #print('Found match')
                 #print('date='+str(z))
-                print('protected Date='+str(lowerDateProtection))
+                #print('protected Date='+str(lowerDateProtection))
                 lowerDateProtection=divDate
                 divTotal=divTotal+divValue
                 mainStockArray[h].historyDic[z][3]=divTotal

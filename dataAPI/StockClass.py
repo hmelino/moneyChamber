@@ -1,3 +1,5 @@
+import json
+
 class Stock:
   def __init__(self,ticker,amount,date,transactionDic,price,etf,historyDic,dividendDic,timeStamp):
     self.ticker = ticker
@@ -9,3 +11,4 @@ class Stock:
     self.historyDic=historyDic
     self.dividendDic=dividendDic
     self.timeStamp=timeStamp
+  

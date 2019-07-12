@@ -17,7 +17,7 @@ def createData(selectedStock,mainStockArray):
   
   #dowload all stock data avaiable
   jsonData=downloadData.oneTimeConnection(stockTicker)
-  
+  #print(jsonData)
 
   # define date now
   dateNow=datetime.datetime.today().date()
@@ -43,6 +43,7 @@ def createData(selectedStock,mainStockArray):
   stockTotalTotal=totalAmountToday*mainStockArray[selectedStock].price
   
   priceDic=functionsLibrary.createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic)
+  #print(priceDic)
   
   
   # create time stamp data from JSONdata
@@ -79,4 +80,4 @@ def createData(selectedStock,mainStockArray):
   offline.close()
   
 
-  return floatArray
+  

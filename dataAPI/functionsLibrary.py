@@ -2,6 +2,9 @@ import datetime
 import pickle
 import emailObject
 from emailObject import *
+import realTimeData
+from realTimeData import *
+
 def dateArray(mainStockArray):
   oldDateArray=[]
   for n in range(len(mainStockArray)-1):
@@ -220,11 +223,72 @@ def isMainStockArraySaved():
   
 
 def checkDateOfSavedData(mainStockArray):
+  print('Starting Date Check')
+  todaysDate=datetime.date.today()
+  todaysHour=datetime.datetime.now().hour
+
+  #print(todaysHour)
+  #print(todaysDate)
+  upToDate=False
   if mainStockArray[0].timeStamp==datetime.date.today():
     print("Your saved data are up to date")
+    upToDate=True
+  elif mainStockArray[0].timeStamp==datetime.date.today()-datetime.timedelta(1):
+      print("You have 1 day old data, gonna try dowload new ones")
+      upToDate=True
+      if todaysHour<8:
+        print('Markets are not opened yet')
+      elif todaysHour>8 and todaysHour<17:
+        print('End of Day price is not ready yey')
+      elif todaysHour>17:
+        print('Markets are closed,gonna try dowload data')
+        data=realTimeData.getRealTimeData(realTimeData.namesArray)
+        print("data="+str(data))
+        print("dowloaded Real Time Data")
+        for n in range(len(mainStockArray)):
+          #print(mainStockArray[n].ticker)
+          if mainStockArray[n].ticker in data:
+            pass
+            yesterdaysData=mainStockArray[n].historyDic[todaysDate-datetime.timedelta(1)]
+            arrej=[]
+            newPrice=data[mainStockArray[n].ticker]
+            if mainStockArray[n].ticker == 'VMID' or mainStockArray[n].ticker=='VUKE':
+              newPrice=newPrice*100
+            arrej.append(newPrice)
+            arrej.append(yesterdaysData[1])
+            arrej.append(yesterdaysData[2])
+            arrej.append(yesterdaysData[3])
+            mainStockArray[n].historyDic[todaysDate]=arrej
+            print(arrej)
+        mainStockArray[0].timeStamp=todaysDate
+      
+      
   else:
     print("Saved data are old")
     print(mainStockArray[0].timeStamp)
+    upToDate=False
+  return upToDate
+  
+def createFloatArrayV2(mainStockArray,dateArray):
+  uArray=[]
+  dailyFloat=0
+  for n in range(len(mainStockArray)):
+    #separate Stocks
+    gArray=[]
+    for m in sorted(dateArray):
+      if m in sorted(mainStockArray[n].historyDic):
+        realTprice=mainStockArray[n].historyDic[m][0]
+        boughtAt=mainStockArray[n].historyDic[m][2]
+        amount=mainStockArray[n].historyDic[m][1]
+        dividend=mainStockArray[n].historyDic[m][3]
+        dailyFloat=(((realTprice-boughtAt)*amount)/100)+dividend
+        gArray.append(dailyFloat)
+      else:
+        gArray.append(0)
+    uArray.append(gArray)
+  return uArray
+  
+
 	    
 
 

@@ -1,13 +1,16 @@
-#https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=BT.lon&apikey="apiKeyRemoved"
-
-
-#https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&outputsize=full&symbol=LLOY.lon&apikey="apiKeyRemoved"
-
-firstHalf='https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&outputsize=full&symbol='
-middleBit='BT'
-lastBit='&apikey="apiKeyRemoved"'
-
-if middleBit != 'BT':
-  middleBit=middleBit+str('.LON')
-full=firstHalf+middleBit+lastBit
-print(full)
+class User:
+   """
+   Custom User Class
+   """
+    def __init__(self,name,age,active,balance,other_names,friends,spouse):
+        self.name = name
+        self.age = age
+        self.active = active
+        self.balance = balance
+        self.other_names = other_names
+        self.friends = friends
+        self.spouse = spouse
+        
+    def __str__(self):
+        return self.name
+p=Us
