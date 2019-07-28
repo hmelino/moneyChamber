@@ -25,6 +25,7 @@ from offlineData import *
 import createStockData
 from createStockData import *
 import numpy as np
+import notification
 
 
 
@@ -66,7 +67,7 @@ for n in range(len(mainStockArray)):
 
 
 #create Float Array
-uArray=functionsLibrary.createFloatArrayV2(mainStockArray,dateArray)
+uArray=functionsLibrary.createFloatArrayV2(mainStockArray,dateArray,True)
 
 
 kolokolo=[]
@@ -86,14 +87,18 @@ for n in black:
     black=black[:n]
 
 
+
+
 plt.plot(black)
 plt.axhline(0, color='lightseagreen')
+plt.axhline(black[len(black)-1], color='green')
 plt.show()
 
 functionsLibrary.saveMainStockArray(mainStockArray)
 
 end = time.time()
 print(end-start)
+notification.schedule("Today your portfolio is up by £"+str(round(black[len(black)-1])))
 
 
 

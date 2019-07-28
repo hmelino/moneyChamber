@@ -269,7 +269,8 @@ def checkDateOfSavedData(mainStockArray):
     upToDate=False
   return upToDate
   
-def createFloatArrayV2(mainStockArray,dateArray):
+def createFloatArrayV2(mainStockArray,dateArray,showDividend):
+  
   uArray=[]
   dailyFloat=0
   for n in range(len(mainStockArray)):
@@ -281,13 +282,24 @@ def createFloatArrayV2(mainStockArray,dateArray):
         boughtAt=mainStockArray[n].historyDic[m][2]
         amount=mainStockArray[n].historyDic[m][1]
         dividend=mainStockArray[n].historyDic[m][3]
-        dailyFloat=(((realTprice-boughtAt)*amount)/100)+dividend
+        if showDividend==True:
+          dailyFloat=(((realTprice-boughtAt)*amount)/100)+dividend
+        else:
+          dailyFloat=(((realTprice-boughtAt)*amount)/100)
         gArray.append(dailyFloat)
       else:
         gArray.append(0)
     uArray.append(gArray)
   return uArray
   
+  
+#fix if last number is 0
+def fixLast0(black):
+  for n in range(len(black)-1):
+    if black[n] == 0:
+      print("found mistake")
+      black=black[:n]
+  return black
 
 	    
 

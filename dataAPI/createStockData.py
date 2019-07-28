@@ -75,9 +75,9 @@ def createData(selectedStock,mainStockArray):
   
   #save data
   mainStockArray[selectedStock].historyDic=historyDic
-  offline=open('offlineData/leStorage.py','a+')
-  offline.write(str(selectedStock)+'='+str(historyDic))
-  offline.close()
+  #offline=open('offlineData/leStorage.py','a+')
+  #offline.write(str(selectedStock)+'='+str(historyDic))
+  #offline.close()
   
 
   
