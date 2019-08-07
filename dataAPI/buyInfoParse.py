@@ -8,6 +8,7 @@ import re
 #just for developing
 import pickle
 import datetime
+import ast
 
 
 def parseBuyInfo(mainStockArray):
@@ -23,6 +24,26 @@ def parseBuyInfo(mainStockArray):
       o=re.split(':',s[n])
       buyInfoDict[o[0]]=int(o[1])
     arrej.append(buyInfoDict)
+  return arrej
+  
+def parseBuyInfoV2(mainStockArray):
+  arrej=[]
+  arr=[]
+  m=open('buyInfo.py','r')
+  i=m.readlines()
+  for n in range(len(i)):
+    p=i[n]
+    u=p.split("=")
+    t=ast.literal_eval(u[1])
+    arrej.append[t]
+    #r=re.sub('[a-zA-Z{=""}]','',p)
+    
+    #s=re.split(',',r)
+    #buyInfoDict={}
+    #for n in range(len(s)):
+      #o=re.split(':',s[n])
+      #buyInfoDict[o[0]]=int(o[1])
+    #arrej.append(buyInfoDict)
   return arrej
   
   
@@ -83,7 +104,7 @@ def parseDividendInfo(mainStockArray):
 #pickle_out=open('pickle/MainStockArray.pickle','rb')
 #mainStockArray=pickle.load(pickle_out)
 
-#m=parseDividendInfo()
+#o=parseBuyInfoV2(mainStockArray)
   
   
   

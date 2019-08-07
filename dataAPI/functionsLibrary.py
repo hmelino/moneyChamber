@@ -28,16 +28,25 @@ def createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic):
   # create dic of prices based on how long I owned them
   priceDicValue=0
   boughtAt=0
+  backupPrice=0
   for n in range(int(ownershipPeriod)+1):
     demDate = dateNow-datetime.timedelta(n)
     if str(demDate) in jsonData['Time Series (Daily)']:
       priceDicValue = float(jsonData['Time Series (Daily)'][str(demDate)]['4. close'])
+      # price fix 3213 => 32.13
+      # in case there is missing data
+      if priceDicValue == 0:
+        priceDicValue=backupPrice
+      #skip first loop 
+      if backupPrice != 0:
+        #anomaly found
+        if backupPrice/priceDicValue < 0.5:
+          priceDicValue=priceDicValue/100
+      backupPrice=priceDicValue
       priceDic[demDate]=priceDicValue
-      if demDate in transactionDic:
-        firstlart=float(transactionDic[demDate])/totalAmountToday
     else:
-        #if date doesnt exist, put previous value
-        priceDic[demDate]=priceDicValue
+      priceDic[demDate]=priceDicValue
+  print(priceDic)
   return priceDic
 
 
@@ -270,7 +279,8 @@ def checkDateOfSavedData(mainStockArray):
   return upToDate
   
 def createFloatArrayV2(mainStockArray,dateArray,showDividend):
-  
+  if showDividend==False:
+    print("Dividends are OFF")
   uArray=[]
   dailyFloat=0
   for n in range(len(mainStockArray)):

@@ -34,11 +34,7 @@ def createStockClass():
     myObj=Stock(data[4+i],data[3+i],demm,0,data[5+i],False,{},{},0)
     bigArray.append(myObj)
     i=i+12
-    
-    
-  #etfCheck(bigArray)
-  return myObj
-  #return bigArray
+  return bigArray
   
   
 def convert_to_dict(obj):

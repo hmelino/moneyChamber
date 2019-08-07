@@ -20,31 +20,23 @@ def oneTimeConnection(nameOfStock):
   dateNow=datetime.date.today()
   rawName=nameOfStock
   
-  firstHalf='https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&outputsize=full&symbol='
-  lastBit='&apikey='
-  if nameOfStock in stocksDic:
-    nameOfStock=stocksDic[nameOfStock]
-  else:
-    nameOfStock=nameOfStock+str('.LON')
-  link = firstHalf+nameOfStock+lastBit+apiKeys[3]
+  firstHalf='https://api.worldtradingdata.com/api/v1/history?symbol='
+  lastBit=".L&sort=newest&api_token=8L4gZYTAF3c9PzTCVlHpZrwwTisaK77bRVTRFWfVKygr7DZdm4dakHUX5QrK"
+  #if nameOfStock in stocksDic:
+    #nameOfStock=stocksDic[nameOfStock]
+  #else:
+    #nameOfStock=nameOfStock+str('.LON')
+  link = firstHalf+nameOfStock+lastBit
   
   try:
     res = requests.get(link).json()
-    if 'Note' in res:
-      print("Changing api key")
-      for n in range(60,0,-1):
-        print(n)
-        time.sleep(1)
-      res = requests.get(link).json()
-    elif 'Error Message' in res:
-      print('Error')
   except requests.exceptions.ConnectionError:
     print('You are offline')
   print("Dowloaded "+str(nameOfStock))
   return res
 
 
-
+u=oneTimeConnection("VUKE")
       
     
 

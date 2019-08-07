@@ -76,32 +76,60 @@ for n in range(len(mainStockArray)):
   kolokolo.append(l)
 print(kolokolo)
   
-
+functionsLibrary.saveMainStockArray(mainStockArray)
 
 gray=np.array(uArray)
 black=gray.sum(axis=0)
 #fix if last number is 0
-for n in black:
-  if black[n] == 0:
-    print("found mistake")
-    black=black[:n]
+#for n in black:
+  #if black[n] == 0:
+    #print("found mistake")
+    #black=black[:n]
 
-
-
-
-plt.plot(black)
-plt.axhline(0, color='lightseagreen')
-plt.axhline(black[len(black)-1], color='green')
-plt.show()
-
-functionsLibrary.saveMainStockArray(mainStockArray)
 
 end = time.time()
 print(end-start)
-notification.schedule("Today your portfolio is up by £"+str(round(black[len(black)-1])))
+def countAccTotalValue():
+  accTotalValue=0
+  for n in range(len(mainStockArray)):
+    amount=float(mainStockArray[n].amount)
+    price=float(mainStockArray[n].price)
+    for m in mainStockArray[n].historyDic:
+      div=mainStockArray[n].historyDic[m][3]
+      value=((amount*price)/100)+div
+      break
+    accTotalValue=accTotalValue+value
+  return round(accTotalValue,2)
+def countTotalDivs():
+  value=0
+  for n in range(len(mainStockArray)):
+    amount=float(mainStockArray[n].amount)
+    price=float(mainStockArray[n].price)
+    for m in mainStockArray[n].historyDic:
+      div=mainStockArray[n].historyDic[m][3]
+      value=value+div
+      break
+  return round(float(value),2)
+print(countTotalDivs())
+    
+    
+accValue=countAccTotalValue()
+totalProfit=black[len(black)-1]
+print(totalProfit)
+
+#percent increase 
+percent= ((totalProfit/countAccTotalValue())*100)
+percent=round(percent,2)
+print(percent)
+
+notification.schedule("Today your portfolio is up by £"+str(round(black[len(black)-1]))+"\n "+str(percent)+"%")
 
 
-
+plt.plot(black)
+plt.axhline(0, color='blue')
+plt.axhline(black[len(black)-1], color='lightseagreen')
+plt.axhline(countTotalDivs(),color='lightseagreen')
+plt.show()
 
 		
 
