@@ -23,30 +23,26 @@ def dateArray(mainStockArray):
 
 
 
-def createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic):
+def createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic,etf):
+  nameOfStock=jsonData['name'].split(".")[0]
+  realTimeDataArr=realTimeData.getRealTimeData(realTimeData.namesArray)
   priceDic={}
   # create dic of prices based on how long I owned them
   priceDicValue=0
-  boughtAt=0
-  backupPrice=0
   for n in range(int(ownershipPeriod)+1):
     demDate = dateNow-datetime.timedelta(n)
-    if str(demDate) in jsonData['Time Series (Daily)']:
-      priceDicValue = float(jsonData['Time Series (Daily)'][str(demDate)]['4. close'])
-      # price fix 3213 => 32.13
-      # in case there is missing data
-      if priceDicValue == 0:
-        priceDicValue=backupPrice
-      #skip first loop 
-      if backupPrice != 0:
-        #anomaly found
-        if backupPrice/priceDicValue < 0.5:
-          priceDicValue=priceDicValue/100
-      backupPrice=priceDicValue
-      priceDic[demDate]=priceDicValue
+    if str(demDate) in jsonData['history']:
+      priceDicValue = float(jsonData['history'][str(demDate)]['close'])
+    elif datetime.date.today()==demDate:
+      priceDicValue=realTimeDataArr[nameOfStock]
+    else:
+      pass
+    if etf==True:
+      priceDic[demDate]=priceDicValue*100
     else:
       priceDic[demDate]=priceDicValue
-  print(priceDic)
+      
+    
   return priceDic
 
 
@@ -102,8 +98,10 @@ def createFloatDic():
 	return floatDic
 	
 # create precious base prices
-def createPreviousBasePrice(historyDic,selectedStock,mainStockArray):
+def createPreviousBasePrice(historyDic,selectedStock,mainStockArray,etf):
 	basePrice=float(mainStockArray[selectedStock].price)
+	if etf == True:
+	  basePrice=basePrice*100
 	#how many times bough this stock
 	transactions=int(len(mainStockArray[selectedStock].transactionDic))
 	transactionDic=mainStockArray[selectedStock].transactionDic

@@ -6,9 +6,13 @@ from functionsLibrary import *
 
 def createData(selectedStock,mainStockArray):
   print(" ")
+  etf=False
+  etfArray=["VUKE","VMID"]
 
   transactionDic=mainStockArray[selectedStock].transactionDic
   stockTicker=mainStockArray[selectedStock].ticker
+  if stockTicker in etfArray:
+    etf=True
   
   
   
@@ -42,15 +46,20 @@ def createData(selectedStock,mainStockArray):
   
   stockTotalTotal=totalAmountToday*mainStockArray[selectedStock].price
   
-  priceDic=functionsLibrary.createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic)
+  priceDic=functionsLibrary.createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic,etf)
   #print(priceDic)
   
   
   # create time stamp data from JSONdata
-  timeStampRaw=jsonData['Meta Data']['3. Last Refreshed']
-  timeStamp=datetime.datetime.strptime(timeStampRaw,'%Y-%m-%d').date()
-  mainStockArray[selectedStock].timeStamp=timeStamp
-  print('- added time stamp')
+  #timeStampRaw=jsonData['name'].keys()
+  #firstOne=0
+  #for n in timeStampRaw:
+    #firstOne=n
+    #break
+  #print(firstOne)
+  #timeStamp=datetime.datetime.strptime(timeStampRaw,'%Y-%m-%d').date()
+  #mainStockArray[selectedStock].timeStamp=timeStamp
+  #print('- added time stamp')
   #end
   
   
@@ -61,7 +70,7 @@ def createData(selectedStock,mainStockArray):
   
   
   # update previous base prices in History Dictionary
-  historyDic=functionsLibrary.createPreviousBasePrice(historyDic,selectedStock,mainStockArray)
+  historyDic=functionsLibrary.createPreviousBasePrice(historyDic,selectedStock,mainStockArray,etf)
   
   
   

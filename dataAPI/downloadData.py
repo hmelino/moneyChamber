@@ -15,6 +15,9 @@ stocksDic={'BT':'lon:bt-a'}
 
 
 def oneTimeConnection(nameOfStock):
+  if nameOfStock == "BT":
+    nameOfStock="BT.A"
+  
   dctionarry={}
   res = ''
   dateNow=datetime.date.today()
