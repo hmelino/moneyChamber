@@ -4,7 +4,7 @@ import functionsLibrary
 from functionsLibrary import *
 
 
-def createData(selectedStock,mainStockArray):
+def createData(selectedStock,mainStockArray,realTimeDataArr):
   print(" ")
   etf=False
   etfArray=["VUKE","VMID"]
@@ -46,24 +46,8 @@ def createData(selectedStock,mainStockArray):
   
   stockTotalTotal=totalAmountToday*mainStockArray[selectedStock].price
   
-  priceDic=functionsLibrary.createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic,etf)
-  #print(priceDic)
+  priceDic=functionsLibrary.createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic,etf,realTimeDataArr)
   
-  
-  # create time stamp data from JSONdata
-  #timeStampRaw=jsonData['name'].keys()
-  #firstOne=0
-  #for n in timeStampRaw:
-    #firstOne=n
-    #break
-  #print(firstOne)
-  #timeStamp=datetime.datetime.strptime(timeStampRaw,'%Y-%m-%d').date()
-  #mainStockArray[selectedStock].timeStamp=timeStamp
-  #print('- added time stamp')
-  #end
-  
-  
-  priceDic=functionsLibrary.fixZeroPriceDay(priceDic,oneDay)
   priceDic=functionsLibrary.fixPriceAnomalies(mainStockArray,priceDic,selectedStock)
   
   historyDic=functionsLibrary.createHistoryDic(totalAmountToday,mainStockArray,selectedStock,priceDic)

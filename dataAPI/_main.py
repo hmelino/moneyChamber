@@ -26,6 +26,8 @@ import createStockData
 from createStockData import *
 import numpy as np
 import notification
+import realTimeData
+from realTimeData import *
 
 
 
@@ -48,8 +50,9 @@ for n in range(len(buyInfo)):
 if functionsLibrary.checkDateOfSavedData(mainStockArray) == True:pass
 
 else:
+  realTimeDataArr=realTimeData.getRealTimeData(realTimeData.namesArray)
   for n in range(15):
-    o=createStockData.createData(n,mainStockArray)
+    o=createStockData.createData(n,mainStockArray,realTimeDataArr)
   
  
 
@@ -67,7 +70,7 @@ for n in range(len(mainStockArray)):
 
 
 #create Float Array
-uArray=functionsLibrary.createFloatArrayV2(mainStockArray,dateArray,True)
+uArray=functionsLibrary.createFloatArrayV2(mainStockArray,dateArray,False)
 
 
 kolokolo=[]
@@ -87,8 +90,8 @@ black=gray.sum(axis=0)
     #black=black[:n]
 
 
-end = time.time()
-print(end-start)
+
+
 def countAccTotalValue():
   accTotalValue=0
   for n in range(len(mainStockArray)):
@@ -130,7 +133,8 @@ plt.axhline(0, color='blue')
 plt.axhline(black[len(black)-1], color='lightseagreen')
 plt.axhline(countTotalDivs(),color='lightseagreen')
 plt.show()
-
+end = time.time()
+print(end-start)
 		
 
 

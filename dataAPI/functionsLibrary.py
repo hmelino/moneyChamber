@@ -23,9 +23,9 @@ def dateArray(mainStockArray):
 
 
 
-def createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic,etf):
+def createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic,etf,realTimeDataArr):
   nameOfStock=jsonData['name'].split(".")[0]
-  realTimeDataArr=realTimeData.getRealTimeData(realTimeData.namesArray)
+  
   priceDic={}
   # create dic of prices based on how long I owned them
   priceDicValue=0
