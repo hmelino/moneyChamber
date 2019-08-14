@@ -40,7 +40,7 @@ start = time.time()
 mainStockArray=functionsLibrary.isMainStockArraySaved()
 
 #Process mainStockArray
-buyInfo=buyInfoParse.parseBuyInfo(mainStockArray)
+buyInfo=buyInfoParse.parseBuyInfoV3(mainStockArray)
 dictionary={}
 for n in range(len(buyInfo)):
   mainStockArray[n].transactionDic=buyInfo[n]
@@ -51,9 +51,11 @@ if functionsLibrary.checkDateOfSavedData(mainStockArray) == True:pass
 
 else:
   realTimeDataArr=realTimeData.getRealTimeData(realTimeData.namesArray)
+  print("Dowloaded real time data")
   for n in range(15):
     o=createStockData.createData(n,mainStockArray,realTimeDataArr)
-  
+  #except:
+    #print("connection Error")
  
 
 mainStockArray=functionsLibrary.multipyETFprice(mainStockArray)
@@ -70,7 +72,7 @@ for n in range(len(mainStockArray)):
 
 
 #create Float Array
-uArray=functionsLibrary.createFloatArrayV2(mainStockArray,dateArray,False)
+uArray=functionsLibrary.createFloatArrayV2(mainStockArray,dateArray,True)
 
 
 kolokolo=[]
@@ -94,6 +96,7 @@ black=gray.sum(axis=0)
 
 def countAccTotalValue():
   accTotalValue=0
+  value=0
   for n in range(len(mainStockArray)):
     amount=float(mainStockArray[n].amount)
     price=float(mainStockArray[n].price)
@@ -125,7 +128,12 @@ percent= ((totalProfit/countAccTotalValue())*100)
 percent=round(percent,2)
 print(percent)
 
-notification.schedule("Today your portfolio is up by £"+str(round(black[len(black)-1]))+"\n "+str(percent)+"%")
+
+profitValue=round(black[len(black)-1])
+upDown="up"
+if profitValue < 0:
+  upDown="down"
+notification.schedule("Today your portfolio is "+str(upDown)+" by £"+str(profitValue)+"\n "+str(percent)+"%")
 
 
 plt.plot(black)
@@ -135,7 +143,8 @@ plt.axhline(countTotalDivs(),color='lightseagreen')
 plt.show()
 end = time.time()
 print(end-start)
-		
+
+
 
 
 

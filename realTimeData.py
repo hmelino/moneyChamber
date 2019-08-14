@@ -22,6 +22,6 @@ def getRealTimeData(namesArray):
   return todaysRealTime
         
   
-u=(getRealTimeData(namesArray))
+#u=(getRealTimeData(namesArray))
 
 

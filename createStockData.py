@@ -22,7 +22,7 @@ def createData(selectedStock,mainStockArray,realTimeDataArr):
   #dowload all stock data avaiable
   jsonData=downloadData.oneTimeConnection(stockTicker)
   #print(jsonData)
-
+  
   # define date now
   dateNow=datetime.datetime.today().date()
   
@@ -41,9 +41,9 @@ def createData(selectedStock,mainStockArray,realTimeDataArr):
   #count total Amount owning by today 
   totalAmountToday=0
   for n in transactionDic.values():
-    totalAmountToday=totalAmountToday+int(n)
+    totalAmountToday=totalAmountToday+int(n[0])
   amount=totalAmountToday
-  
+  print("line39")
   stockTotalTotal=totalAmountToday*mainStockArray[selectedStock].price
   
   priceDic=functionsLibrary.createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic,etf,realTimeDataArr)
@@ -59,12 +59,13 @@ def createData(selectedStock,mainStockArray,realTimeDataArr):
   
   
   #create Array for all days (firstBuy-today)
-  dateArray=functionsLibrary.dateArray(mainStockArray)
+  #dateArray=functionsLibrary.dateArray(mainStockArray)
   
   
 
   # create floatArray from historyDic
-  floatArray=functionsLibrary.floatArrayFromDic(historyDic,dateArray)
+  # saved as 
+  #floatArray=functionsLibrary.floatArrayFromDic(historyDic,dateArray)
   
   #save data
   mainStockArray[selectedStock].historyDic=historyDic

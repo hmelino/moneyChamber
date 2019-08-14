@@ -30,17 +30,17 @@ def createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic,etf,realTimeD
   # create dic of prices based on how long I owned them
   priceDicValue=0
   for n in range(int(ownershipPeriod)+1):
-    demDate = dateNow-datetime.timedelta(n)
-    if str(demDate) in jsonData['history']:
-      priceDicValue = float(jsonData['history'][str(demDate)]['close'])
-    elif datetime.date.today()==demDate:
+    processedDate = dateNow-datetime.timedelta(n)
+    if str(processedDate) in jsonData['history']:
+      priceDicValue = float(jsonData['history'][str(processedDate)]['close'])
+    elif datetime.date.today()==processedDate:
       priceDicValue=realTimeDataArr[nameOfStock]
     else:
       pass
     if etf==True:
-      priceDic[demDate]=priceDicValue*100
+      priceDic[processedDate]=priceDicValue*100
     else:
-      priceDic[demDate]=priceDicValue
+      priceDic[processedDate]=priceDicValue
       
     
   return priceDic
@@ -90,7 +90,7 @@ def createFloatDic():
 	
 	for n in priceDic:
 		if str(n) in transactionDic:
-			amount=amount-int((transactionDic[str(n)]))
+			amount=amount-int((transactionDic[str(n[0])]))
 			floatDic[n]=((priceDic[n]-float(boughtAt))*float(amount))/100
 		else:
 			floatDic[n]=((priceDic[n]-float(boughtAt))*float(amount))/100
@@ -237,7 +237,7 @@ def checkDateOfSavedData(mainStockArray):
   #print(todaysHour)
   #print(todaysDate)
   upToDate=False
-  if mainStockArray[0].timeStamp==datetime.date.today():
+  if todaysDate in mainStockArray[0].historyDic:
     print("Your saved data are up to date")
     upToDate=True
   elif mainStockArray[0].timeStamp==datetime.date.today()-datetime.timedelta(1):

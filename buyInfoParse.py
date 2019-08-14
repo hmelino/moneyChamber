@@ -36,14 +36,6 @@ def parseBuyInfoV2(mainStockArray):
     u=p.split("=")
     t=ast.literal_eval(u[1])
     arrej.append[t]
-    #r=re.sub('[a-zA-Z{=""}]','',p)
-    
-    #s=re.split(',',r)
-    #buyInfoDict={}
-    #for n in range(len(s)):
-      #o=re.split(':',s[n])
-      #buyInfoDict[o[0]]=int(o[1])
-    #arrej.append(buyInfoDict)
   return arrej
   
   
@@ -97,14 +89,26 @@ def parseDividendInfo(mainStockArray):
   return mainStockArray
               
             
+def parseBuyInfoV3(mainStockArray):
+  arrej=[]
+  arr=[]
+  m=open('buyInfo2.py','r')
+  i=m.readlines()
+  for n in range(len(i)):
     
+    p=i[n]
+    
+    u=p.split("=")
+    t=ast.literal_eval(u[1])
+    mainStockArray[n].transactionDic=t
+  return arrej
   
 
   
 #pickle_out=open('pickle/MainStockArray.pickle','rb')
 #mainStockArray=pickle.load(pickle_out)
 
-#o=parseBuyInfoV2(mainStockArray)
+#o=parseBuyInfoV3(mainStockArray)
   
   
   

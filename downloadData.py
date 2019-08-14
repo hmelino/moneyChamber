@@ -41,7 +41,7 @@ def oneTimeConnection(nameOfStock):
   return res
 
 
-u=oneTimeConnection("VUKE")
+#u=oneTimeConnection("VUKE")
       
     
 
