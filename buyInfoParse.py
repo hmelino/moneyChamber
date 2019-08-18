@@ -103,7 +103,17 @@ def parseBuyInfoV3(mainStockArray):
     mainStockArray[n].transactionDic=t
   return arrej
   
-
+def parseDividendV2(mainStockArray):
+  arrej=[]
+  arr=[]
+  m=open('dividendInfo.py','r')
+  i=m.readlines()
+  for n in range(len(i)):
+    p=i[n]
+    u=p.split("=")
+    t=ast.literal_eval(u[1])
+    mainStockArray[n].dividendDic=t
+  return arrej
   
 #pickle_out=open('pickle/MainStockArray.pickle','rb')
 #mainStockArray=pickle.load(pickle_out)
