@@ -35,7 +35,7 @@ def amountUpdate(msArray):
 iN = 0
 msArray = createStockClass()
 try:
-  ui = open("pickle/realTData" + str(today) + ".pickle", "rb")
+  ui = open("pickle/realTData.pickle", "rb")
   realTData = pickle.load(ui)
   ui.close()
   print("Loaded real time prices")
@@ -44,7 +44,7 @@ except:
   realTData = getRealTimeData()
 
 #saveData
-ui = open("pickle/realTData" + str(today) + ".pickle", "wb")
+ui = open("pickle/realTData.pickle", "wb")
 pickle.dump(realTData, ui)
 ui.close()
 
@@ -56,16 +56,16 @@ def createStockFloatV2(iN, msArray, realTData, showDividend):
   today = datetime.date.today()
   periodOwned = today - msArray[iN].date
   try:
-    io = open("pickle/jsonData" + str(iN) + str(today) + ".pickle", "rb")
+    io = open("pickle/jsonData" + str(iN)+ ".pickle", "rb")
     jsonData = pickle.load(io)
     io.close()
 
   except:
     jsonData = oneTimeConnection(msArray[iN].ticker)
-
-  yu = open("pickle/jsonData" + str(iN) + str(today) + ".pickle", "wb")
-  pickle.dump(jsonData, yu)
-  yu.close()
+    yu = open("pickle/jsonData"+str(iN)+".pickle", "wb")
+    pickle.dump(jsonData, yu)
+    yu.close()
+    
   price = realTData[ticker]
   if etf == False:
     price = round(float(price) / 100, 4)
@@ -134,6 +134,7 @@ def createStockFloatV2(iN, msArray, realTData, showDividend):
     arrej.append(floatisND)
     mainDic[str(processedDate)]=arrej
   msArray[iN].historyDic=mainDic
+  return jsonData
 
 
 
