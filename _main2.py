@@ -16,6 +16,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import functionsV2
 from functionsV2 import updateStockTotalAmount
+import indexFund
+from indexFund import *
 today = str(datetime.date.today())
 
 timeStart=datetime.datetime.now()
@@ -34,6 +36,9 @@ def amountUpdate(msArray):
 
 iN = 0
 msArray = createStockClass()
+msSave=open("pickle/mainStockArray.pickle","wb")
+pickle.dump(msArray,msSave)
+msSave.close()
 try:
   ui = open("pickle/realTData.pickle", "rb")
   realTData = pickle.load(ui)
@@ -189,11 +194,12 @@ for y in range(howLong):
       o=msArray[n].historyDic[str(datey)][3]
       value=value+o
   divsArray.append(round(value,4))
-
+indexF=indexFundCount
 plt.plot(finalArray, color="green")
-plt.plot(finalArrayNoDivs, color="red")
 plt.plot(divsArray, color="blue")
 plt.axhline(0, color='blue')
+plt.plot(indexFund.indexFundCount("VUKE",2000,indexFund.oldestDay), color='#a327ff')
+
 plt.show()
 timeFinish=datetime.datetime.now()
 ooo=(timeFinish-timeStart).microseconds

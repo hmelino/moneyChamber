@@ -12,16 +12,22 @@ def nextDividend(ticker,amount):
   for n in o.keys():
     dateArray.append(n)
   p=(o[dateArray[0]]['payDate'])
-  dividendAmount=(float(o[dateArray[0]]['divAmount'])/100)*amount
+  dividendAmount=(float(o[dateArray[0]]['divAmount']))*amount
   payDate=datetime.datetime.strptime(p,"%d%m%Y").date()
   howManyDays=(payDate-today).days
-  print("In next "+str(howManyDays)+" days you will recieve £"+str(round(dividendAmount,2))+" from "+str(ticker))
+  currency=
+  if howManyDays>0:
+    print("In next "+str(howManyDays)+" days you will recieve £"+str(round(dividendAmount,2))+" from "+str(ticker))
   
 divArray=[]
-zum=open("pickle/MainStockArray.pickle","rb")
+zum=open("pickle/mainStockArray.pickle","rb")
 mainStockArray=pickle.load(zum)
 zum.close()
 
+
+
+
+ 
 furebase=firebase.FirebaseApplication('"firebaseLinkRemoved"', None)
 for n in mainStockArray:
   name=n.ticker
@@ -29,5 +35,6 @@ for n in mainStockArray:
   if o:
     amount=int(n.amount)
     nextDividend(name,amount)
+print("Over")
 
   
