@@ -16,7 +16,11 @@ def getRealTimeData():
         if 'realPrice' in n:
           price=float(n['realPrice']['buy'])
           name=n['name']
-          todaysRealTime[name]=price
+          
+          if str(name) in ["VUKE","VMID"]:
+           todaysRealTime[name]=price
+          else:
+           todaysRealTime[name]=price/100
   return todaysRealTime
         
 
