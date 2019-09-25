@@ -19,7 +19,7 @@ from functionsV2 import updateStockTotalAmount
 import indexFund
 from indexFund import *
 import ui
-msArray=["kokot","uiuhh","yudhdh"]
+#msArray=["kokot","uiuhh","yudhdh"]
 
 
 
@@ -58,12 +58,6 @@ msSave.close()
 namesArray=[str(msArray[f].ticker)+" "+str(msArray[f].amount) for f in range(len(msArray))]
 
 
-#pop=['firjd','eusysh','eyehehs']
-#UiView=ui.load_view()
-#UiView.present()
-#label=UiView['tableview1']
-#label.data_source = label.delegate = ui.ListDataSource(namesArray)
-#label.reload_data()
 
 try:
   ui = open("pickle/realTData.pickle", "rb")
@@ -234,7 +228,6 @@ finalArray.append(todaysFloat)
   
   
 indexF=indexFundCount
-#plt.style.use('dark_background')
 plt.plot(finalArray, color="green")
 plt.plot(divsArray, color="blue")
 plt.axhline(0, color='blue')

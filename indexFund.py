@@ -34,12 +34,14 @@ today=datetime.date.today()
 portfolioTotal=2000
 oldestDay=datetime.datetime.strptime("2018.10.26","%Y.%m.%d")
 
+
 def indexFundCount(ticker,portfolioTotal,oldestDay):
-  q=open("offlineData_index.pickle","rb")
+  today=datetime.datetime.today()
+  howManyDays=(today-oldestDay).days
+  q=open("pickle/jsonData0.pickle","rb")
   o=pickle.load(q)
   q.close()
   #processedDate=today-dayDifference
-  howManyDays=301
   date=oldestDay.date()
   price=0
   arrej=[]
@@ -51,7 +53,7 @@ def indexFundCount(ticker,portfolioTotal,oldestDay):
   priceObject.hPrice=basePrice
   
   
-  for n in range(304):
+  for n in range(howManyDays):
     #dates of cash deposits
     if str(date)in cashDeposits:
       totalValueOfDeposits=totalValueOfDeposits+float(cashDeposits[str(date)])
