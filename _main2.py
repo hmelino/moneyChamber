@@ -18,8 +18,7 @@ import functionsV2
 from functionsV2 import updateStockTotalAmount
 import indexFund
 from indexFund import *
-import ui
-#msArray=["kokot","uiuhh","yudhdh"]
+
 
 
 
@@ -171,9 +170,15 @@ def createStockFloatV2(iN, msArray, realTData):
 
 
 
-#amount=msArray[0].amount
+
 for n in range(len(msArray)):
   createStockFloatV2(n, msArray, realTData)
+
+#save msarray after filling it up with data
+msSave=open("pickle/mainStockArray.pickle","wb")
+pickle.dump(msArray,msSave)
+msSave.close()
+
 
 def theOldestDay(msArray):
   theOldestDay=datetime.date.today()
@@ -185,6 +190,7 @@ def theOldestDay(msArray):
 old=theOldestDay(msArray)
 
 howLong=(datetime.date.today()-old).days
+
 
 finalArray=[]
 for y in range(howLong):

@@ -36,11 +36,12 @@ def oneTimeConnection(nameOfStock):
     res = requests.get(link).json()
   except requests.exceptions.ConnectionError:
     print('You are offline')
+    
   print("Dowloaded "+str(nameOfStock))
   return res
 
 
-u=oneTimeConnection("VUKE")
+#u=oneTimeConnection("VUKE")
       
     
 
