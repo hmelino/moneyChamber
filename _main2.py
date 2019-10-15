@@ -20,10 +20,6 @@ import indexFund
 from indexFund import *
 
 
-
-
-
-
 class RealTDataClass:
  def __init__(self,date,data):
   self.date=date
@@ -222,11 +218,7 @@ todaysFloat=0
 for n in range(len(msArray)):
  m=(msArray[n].historyDic[yesterday])
  rTData=realTData.data[msArray[n].ticker]
- print("rTData="+str(rTData))
- print(m)
  q=(rTData-m[2])*m[1]
- #print(rTData)
- print(q)
  todaysFloat=todaysFloat+q
  #msArray[0].historyDic['2019-09-10']
 todaysFloat=round(todaysFloat+divsArray[-1],3)
@@ -261,7 +253,7 @@ for n in range(len(msArray)):
 
  
 print("-----------------------------------------")
-print(str(printFormat).format(" ","£"+str(accTotal),"£ "+str(round(finalArray[-1],2)),divsArray[-1],str(round((finalArray[-1]/accTotal)*100,2))+"%"))
+print(str(printFormat).format(" ","£"+str(round(accTotal,2)),"£ "+str(round(finalArray[-1],2)),divsArray[-1],str(round((finalArray[-1]/accTotal)*100,2))+"%"))
 
 
 
