@@ -1,10 +1,9 @@
 import datetime
-from datetime import date
 import emailData
 from emailData import *
-
+data=emailData.demData
 		
-class Stock:
+"""class Stock:
   def __init__(self,ticker,amount,date,transactionDic,price,etf,historyDic,dividendDic,timeStamp,positionOrders):
     self.ticker = ticker
     self.amount = amount
@@ -16,9 +15,24 @@ class Stock:
     self.dividendDic=dividendDic
     self.timeStamp=timeStamp
     self.positionOrders=positionOrders
+"""
 
+class StockV2():
+	def __init__(self,amount,firstBuy,price):
+		self.amount = amount
+		self.firstBuy = firstBuy
+		self.price = price
+		
+	
+
+
+def stockList():
+	data=emailData.demData
+	return {data[4+(12*f)]:StockV2(int(data[3+(12*f)]),  datetime.datetime.strptime(data[1+(12*f)],"%Y.%m.%d %H:%M"),float(data[5+(12*f)])) for f in range(int(len(emailData.demData)/12))}
+	
 
 	
+"""
 def createStockClass():
   bigArray=[]
   etfArray=["VMID","VUKE"]
@@ -38,6 +52,7 @@ def createStockClass():
     bigArray.append(myObj)
     i=i+12
   return bigArray
+  """
   
   
 

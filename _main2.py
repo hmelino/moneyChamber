@@ -1,79 +1,81 @@
 import emailObject
-from emailObject import createStockClass
-import downloadData
-from downloadData import oneTimeConnection
+from emailObject import stockList
 import datetime
 import realTimeData
 from realTimeData import getRealTimeData
 import buyInfoParse
-from buyInfoParse import parseBuyInfoV3, parseDividendV2
-import sys
-import re
-import ast
-import numpy as np
+from buyInfoParse import parseBuyInfoV4, parseDividendV2
 import pickle
 import matplotlib
 import matplotlib.pyplot as plt
-import functionsV2
-from functionsV2 import updateStockTotalAmount
-import indexFund
-from indexFund import *
+import oldestDay
+from oldestDay import oldestDay
+import historyDic
+from historyDic import stockFloat,HistoryPrice
+import requests
+
+def etfCheck():
+	etfArray=["VUKE","VMID"]
+	for stock in msArray:
+		if stock in etfArray:
+			msArray[stock].etf=True
+		else:
+			msArray[stock].etf=False
+	
 
 
-class RealTDataClass:
- def __init__(self,date,data):
-  self.date=date
-  self.data=data
-  
+msArray = stockList()
+etfCheck()
+parseBuyInfoV4(msArray,"buyInfo.py")
+parseBuyInfoV4(msArray,"dividendInfo.py")
 
-
-def dateConvert(inputDate):
-  newDate = datetime.datetime.strptime(inputDate, "%Y-%m-%d")
-  return newDate.date()
-
-
-def amountUpdate(msArray):
-  totalAmount = 0
-  for n in msArray[iN].transactionDic:
-    amount = msArray[iN].transactionDic[n][0]
-    totalAmount = totalAmount + amount
-  msArray[iN].amount = totalAmount
-
-today = str(datetime.date.today())
-yesterday= str(datetime.date.today()-datetime.timedelta(1))
-twoDaysAgo = str(datetime.date.today()-datetime.timedelta(2))
-timeStart = datetime.datetime.now()
-#indexNumber
-iN = 0
-msArray = createStockClass()
-msSave=open("pickle/mainStockArray.pickle","wb")
-pickle.dump(msArray,msSave)
-msSave.close()
-
-namesArray=[str(msArray[f].ticker)+" "+str(msArray[f].amount) for f in range(len(msArray))]
-
-
-
-try:
-  ui = open("pickle/realTData.pickle", "rb")
-  realTData = pickle.load(ui)
-  ui.close()
-  if str(realTData.date)==str(today):
-   print("Loaded real time prices")
-  else:
-   print("Old real time data")
-   realTData=RealTDataClass(today,getRealTimeData())
-except:
-  print("Dowloading real time prices")
-  realTData=RealTDataClass(today,getRealTimeData())
-
-#saveData
-ui = open("pickle/realTData.pickle", "wb")
-pickle.dump(realTData, ui)
-ui.close()
+floatArray=[]
+for stockName in msArray:
+	q=stockFloat(stockName,msArray)
+	floatArray.append({f:msArray[stockName].historyDic[f].profit for f in msArray[stockName].historyDic})
+	
+oldestDay=oldestDay(floatArray)
+totalFloat=[]
+today=datetime.datetime.today().date()
+portfolioOwned=(today-oldestDay.date()).days
+for day in range(portfolioOwned):
+	processedDay=str((oldestDay + datetime.timedelta(day)).date())
+	print(processedDay)
+	dayTotal=0
+	for stock in msArray:
+		if processedDay in msArray[stock].historyDic:
+			dayTotal+=msArray[stock].historyDic[processedDay].profit
+	totalFloat.append(dayTotal)
 
 
 
+jsonData=requests.get('"secretWebsiteForRealTimeData"').json()
+namesArray=[f for f in msArray]
+
+
+resultDicV2={jsonData[q]['name']:jsonData[q]['price']['buy'] for q in range(len(jsonData)) if jsonData[q]['name'] in namesArray and jsonData[q]['margin']==1}
+
+
+
+
+stock="VMID"
+selectedStock=[msArray[stock].historyDic[f].profit for f in msArray[stock].historyDic]
+plt.plot(selectedStock)
+
+
+
+
+#plotting
+plt.axhline(0)
+plt.show()
+		
+
+
+
+	
+
+
+"""
 def createStockFloatV2(iN, msArray, realTData):
   etf = msArray[iN].etf
   ticker = msArray[iN].ticker
@@ -187,10 +189,12 @@ old=theOldestDay(msArray)
 
 howLong=(datetime.date.today()-old).days
 
-
+"""
+oldestDay=oldestDay(floatArray)
+portfolioOwned=(today-oldestDay.date()).days
 finalArray=[]
-for y in range(howLong):
-  datey=old+datetime.timedelta(y)
+for y in range(portfolioOwned):
+  datey=oldestDay+datetime.timedelta(y)
   value=0
   
   for n in range(len(msArray)):
@@ -200,18 +204,10 @@ for y in range(howLong):
       value=value+o
   finalArray.append(round(value,4))
 
+"""
 
 
 
-divsArray=[]
-for y in range(howLong):
-  datey=old+datetime.timedelta(y)
-  value=0
-  for n in range(len(msArray)):
-    if str(datey) in msArray[n].historyDic:
-      o=msArray[n].historyDic[str(datey)][3]
-      value=value+o
-  divsArray.append(round(value,4))
   
 # todays data into finalArray
 todaysFloat=0
@@ -255,7 +251,7 @@ for n in range(len(msArray)):
 print("-----------------------------------------")
 print(str(printFormat).format(" ","£"+str(round(accTotal,2)),"£ "+str(round(finalArray[-1],2)),divsArray[-1],str(round((finalArray[-1]/accTotal)*100,2))+"%"))
 
-
+"""
 
 
 

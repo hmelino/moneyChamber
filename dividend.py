@@ -17,8 +17,6 @@ class PotentialBuy:
 		self.price=price
 		self.amount=amount
 	
-		
-
 
 
 dividendCalendarV3={}
@@ -63,9 +61,9 @@ def processData(compound:bool(),ticker:str(),deposits:bool()):
 		stringDay=day.strftime("%m-%d")
 		
 		if stringDay in dividendCalendarV3:
+			for q in range(int(len(dividendCalendarV3[stringDay])/2)):
 			name=(dividendCalendarV3[stringDay][0])
-			print(name)
-			print(day.date())
+			#0,1,2,3
 			
 			
 			if compound is True:
