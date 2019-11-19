@@ -8,7 +8,7 @@ def getRealTimeData():
   dArray=[]
   todaysRealTime={}
   start=datetime.datetime.today()
-  res=requests.get('"secretWebsiteForRealTimeData"').json()
+  res=requests.get('"websiteRemoved"').json()
   indexNum=0
   for p in range(len(namesArray)):
     for n in res:
