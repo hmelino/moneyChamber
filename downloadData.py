@@ -1,7 +1,7 @@
 import requests
 import sensData 
+import pickle
 from sensData import apiKey
-apiKeyV2="lLRMkgWZYc8TYtrsm45i46pxhk8McDXuWPaYkKVmXO8bjX1t1Zqsle0Rm59f"
 
 def oneTimeConnection(stockName):
 	if stockName == "BT":
@@ -9,7 +9,7 @@ def oneTimeConnection(stockName):
 	fHalf='https://api.worldtradingdata.com/api/v1/history?symbol='
 	sHalf=".L&sort=newest&api_token="
 	try:
-		res = requests.get(fHalf+stockName+sHalf+apiKeyV2).json()
+		res = requests.get(fHalf+stockName+sHalf+apiKey).json()
 		print("Dowloaded "+str(stockName))
 		return res
 	except requests.exceptions.ConnectionError:

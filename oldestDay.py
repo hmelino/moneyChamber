@@ -1,5 +1,5 @@
 import datetime
-def oldestDay(floatArray):
+def whatsOldestDay(floatArray):
 	for stock in range(len(floatArray)):
 		sample=datetime.datetime.today()
 		sampleV2=datetime.datetime.strptime([f for
