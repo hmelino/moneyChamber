@@ -1,6 +1,7 @@
 import requests
 import sensData 
 import pickle
+import sys
 from sensData import apiKey
 
 def oneTimeConnection(stockName):
@@ -14,4 +15,4 @@ def oneTimeConnection(stockName):
 		return res
 	except requests.exceptions.ConnectionError:
 		print('You are offline')
-
+		sys.exit()

@@ -12,8 +12,9 @@ class RTData:
 		
 def getJsonData():
 	try:
+		print("Downloading Real Time Data")
 		jsonData=requests.get(realTwebsite).json()
-		print("Downloaded real time data")
+		print(f"Data as of {datetime.datetime.today().strftime('%d-%m-%Y , %H:%M')}")
 		return jsonData
 	except :
 		data=pickle.load(open("pickle/realTData.pickle","rb"))
@@ -43,7 +44,6 @@ def addTodaysPrices(msArray):
 	today=datetime.datetime.today().strftime("%Y-%m-%d")
 	yesterday=(datetime.datetime.today()-datetime.timedelta(1)).strftime("%Y-%m-%d")
 	for stock in resultDicV2:
-		print(stock)
 		if msArray[stock].etf == False:
 			resultDicV2[stock]/=100
 		if yesterday not in msArray[stock].historyDic:

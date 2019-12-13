@@ -15,23 +15,29 @@ class HistoryPrice:
 		self.amount=amount
 		self.profit=profit
 		self.dividends=dividends
+		
+def freshData(stock):
+	jsonData=oneTimeConnection(stock)
+	loadedFile=RealTDataClass(datetime.datetime.today(),jsonData)
+	pickle.dump(loadedFile,open("pickle/"+str(stock)+".pickle","wb"))
+	return loadedFile
 
 def stockFloat(stock,msArray):
 	today=datetime.datetime.today()
 	try:
-		loaded=pickle.load(open("pickle/"+str(stock)+".pickle","rb"))
-		jsonData=loaded.data
-		dataDate=(today.date()-loaded.date.date()).days
-		if dataDate <= 2:
-			print(f"Loaded {stock}")
-		else:
-			print(f"Dowloaded stock data is old {dataDate} days")
-			causeError()
-	except:
-		jsonData=oneTimeConnection(stock)
-		pickle.dump(RealTDataClass(datetime.datetime.today(),jsonData),open("pickle/"+str(stock)+".pickle","wb"))
+		loadedFile=pickle.load(open("pickle/"+str(stock)+".pickle","rb"))
+		jsonData=loadedFile.data
+		print(f"Loaded {stock}")
+	except :
+		loadedFile=freshData(stock)
+		jsonData=loadedFile.data
 		
+	howOldData=today.date()-loadedFile.date.date()
+	if howOldData.days>1:
+		print(f"Saved data is {howOldData} old")
+		jsonData=freshData(stock)
 		
+	
 	periodOwned=(datetime.datetime.today()-msArray[stock].firstBuy).days
 	
 	#create history dictionary w previous base price

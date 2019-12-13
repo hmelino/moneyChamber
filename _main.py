@@ -1,4 +1,4 @@
-from emailObject import stockList
+from emailObject import processMonthlyStatement
 from realTimeData import getRealTimeData
 from buyInfoParse import parseBuyInfoV4, parseDividendV2
 from historyProfit import historyProfit
@@ -9,7 +9,7 @@ from addTodaysPrices import addTodaysPrices
 from etfCheck import etfCheck
 import sys
 
-msArray = stockList()
+msArray = processMonthlyStatement()
 etfCheck(msArray)
 parseBuyInfoV4(msArray,"buyInfo.py")
 parseBuyInfoV4(msArray,"dividendInfo.py")
@@ -17,16 +17,13 @@ totalFloat=historyProfit(msArray,stockFloat)
 addTodaysPrices(msArray)
 
 
+
 def saveMsArray(msArray):
 	import pickle
 	pickle.dump(msArray,open("pickle/mainStockArray.pickle","wb"))
 	
-saveMsArray(msArray)
+
 	
-for stock in msArray:
-	msArray[stock].historyDic
-
-
 
 import numpy as np
 fig=plt.figure()
@@ -39,6 +36,11 @@ plt.plot(totalFloat)
 plt.axhline(0)
 
 
+import datetime
+#updateTotalAmountinProcessing price
+for stock in msArray:
+	msArray[stock].amount=msArray[stock].historyDic[datetime.datetime.today().strftime("%Y-%m-%d")].amount
 
+saveMsArray(msArray)
 
 plt.show()

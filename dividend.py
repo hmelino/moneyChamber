@@ -37,9 +37,15 @@ dict=createDivDictionarie()
 
 today=datetime.datetime.today().date()
 
+ 
 
+
+
+
+yearsTotalList=[]
+yearsTotal=0
 yearList=[]
-for d in range(365):
+for d in range(366):
 	todaysDividend=0
 	day=str(today+datetime.timedelta(d))[5:]
 	if str(day) in dict:
@@ -50,11 +56,37 @@ for d in range(365):
 			amount=msArray[stockName].amount
 			yearList.append(todaysDividend*amount)
 			print(f"|{round(todaysDividend*amount,2)}| {stockName}|{day}|{todaysDividend}|{amount}")
+			yearsTotal+=todaysDividend*amount
+			
 	else:
 		yearList.append(todaysDividend)
+	yearsTotalList.append(yearsTotal)
 		
 plt.plot(yearList)
+plt.plot(yearsTotalList)
 plt.show()
+print(f"Total div payout is {yearsTotal}")
+
+
+
+
+def countYeld():
+	
+	
+	
+#work in progress
+	for stock in msArray:
+		stockValue=msArray[stock].price
+		stockTotal=[]
+		for date in msArray[stock].dividendInfo:
+			if date != "0":
+				day=datetime.datetime.strptime(date,"%Y-%m-%d")
+				if (today-day.date()).days <= 365:
+					stockTotal.append(msArray[stock].dividendInfo[date])
+		yeld=sum(stockTotal)/stockValue
+		print(f"Div of {stock} is {sum(stt)}")
+		#return stockTotal
+qq=countYeld()
 		
 
 	
