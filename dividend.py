@@ -71,21 +71,22 @@ print(f"Total div payout is {yearsTotal}")
 
 
 def countYeld():
-	
-	
-	
-#work in progress
 	for stock in msArray:
 		stockValue=msArray[stock].price
-		stockTotal=[]
+		if msArray[stock].etf==True:
+			stockValue*=100
+		stockValue/=100
+		payouts=[]
 		for date in msArray[stock].dividendInfo:
 			if date != "0":
 				day=datetime.datetime.strptime(date,"%Y-%m-%d")
 				if (today-day.date()).days <= 365:
-					stockTotal.append(msArray[stock].dividendInfo[date])
-		yeld=sum(stockTotal)/stockValue
-		print(f"Div of {stock} is {sum(stt)}")
-		#return stockTotal
+					amount=msArray[stock].historyDic[date].amount
+					div=msArray[stock].dividendInfo[date]
+					payouts.append(div/amount)
+		yeld=round(((sum(payouts))/stockValue)*100,2)
+		print(f"Div of {stock} is {yeld}")
+		
 qq=countYeld()
 		
 
