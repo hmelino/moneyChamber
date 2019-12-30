@@ -35,7 +35,8 @@ def stockFloat(stock,msArray):
 	howOldData=today.date()-loadedFile.date.date()
 	if howOldData.days>1:
 		print(f"Saved data is {howOldData} old")
-		jsonData=freshData(stock)
+		jsonData=freshData(stock).data
+		
 		
 	
 	periodOwned=(datetime.datetime.today()-msArray[stock].firstBuy).days

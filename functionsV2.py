@@ -5,4 +5,6 @@ def updateStockTotalAmount(msArray,iN):
     total=total+value
   msArray[iN].amount=total
   
-  
+def saveMsArray(msArray):
+	import pickle
+	pickle.dump(msArray,open("pickle/mainStockArray.pickle","wb"))

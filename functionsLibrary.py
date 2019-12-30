@@ -20,9 +20,6 @@ def dateArray(mainStockArray):
     dateArray.append(demDay)
   return dateArray
 
-
-
-
 def createPriceDic(ownershipPeriod,dateNow,jsonData,transactionDic,etf,realTimeDataArr):
   nameOfStock=jsonData['name'].split(".")[0]
   
