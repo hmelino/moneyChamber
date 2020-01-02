@@ -53,4 +53,5 @@ def addTodaysPrices(msArray):
 		todaysPrice=resultDicV2[stock]
 		todaysProfit=(todaysPrice-yesterdayData.basePrice)*yesterdayData.amount
 		msArray[stock].historyDic[today]=HistoryPrice(yesterdayData.basePrice,yesterdayData.amount,todaysProfit,yesterdayData.dividends)
+		msArray[stock].price=todaysPrice
 	return msArray

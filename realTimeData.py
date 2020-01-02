@@ -1,5 +1,6 @@
 import requests
 import datetime
+from sensData import realTwebsite
 namesArray=['VUKE', 'VMID', 'PSN', 'HL', 'INVP', 'VOD', 'MKS', 'EVR', 'BT', 'LLOY', 'AV', 'PTEC', 'CREI', 'HMSO', 'CNCT']
 
 
@@ -8,7 +9,7 @@ def getRealTimeData():
   dArray=[]
   todaysRealTime={}
   start=datetime.datetime.today()
-  res=requests.get('"websiteRemoved"').json()
+  res=requests.get(realTwebsite).json()
   indexNum=0
   for p in range(len(namesArray)):
     for n in res:
