@@ -1,3 +1,5 @@
+import traceback
+traceback.print_exc()
 from emailObject import getMsArray, saveMsArray
 from realTimeData import getRealTimeData
 from processBuyStatement import processStatementV4
@@ -55,3 +57,4 @@ def everyDayInYear(day:int):
 oDay=findOldestDay(msArray)
 o=totalDividendPaid(oDay)
 #totalDividendPaid()
+o=0
