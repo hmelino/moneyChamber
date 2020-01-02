@@ -1,2 +1,4 @@
 *.pickle
 sensData.py
+.vscode/*
+__pycache__/*
