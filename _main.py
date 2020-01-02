@@ -1,20 +1,15 @@
-from emailObject import processMonthlyStatement
+from msArrayObject import getMsArray
 from realTimeData import getRealTimeData
-from buyInfoParse import parseBuyInfoV4, parseDividendV2
+from processStatementInfo import processStatementV4
 from historyProfit import historyProfit
 from historyDic import stockFloat,HistoryPrice
 from addTodaysPrices import addTodaysPrices
-from etfCheck import etfCheck
 from saveFile import saveMsArray
 from graphFunctions import plotGraph
 from mainStockArray import updateStockAmountTotal
 import sys
 
-	
-
-oldestDay=None
-msArray = processMonthlyStatement()
-etfCheck(msArray)
+msArray = getMsArray()
 
 def findOldestDay(msArray):
 	import datetime
@@ -25,18 +20,29 @@ def findOldestDay(msArray):
 			oldestDay=day
 	return oldestDay
 
-portfolioAttributes=None
+
 	
 	
-parseBuyInfoV4(msArray,"buyInfo.py")
-parseBuyInfoV4(msArray,"dividendInfo.py")
+processStatementV4(msArray,"buyInfo.py")
+processStatementV4(msArray,"dividendInfo.py")
 totalFloat=historyProfit(msArray,stockFloat)
 addTodaysPrices(msArray)
 plotGraph(totalFloat)
 updateStockAmountTotal(msArray)
 saveMsArray(msArray)
 
-#def totalDividendPaid():
+def totalDividendPaid(oldestDay):
+	import datetime
+	totalDiv=0
+	timeRange=datetime.datetime.today().date()-oldestDay
+	for day in range(timeRange.days):
+		pDay=oldestDay+datetime.timedelta(day)
+		
+		for stock in msArray:
+			if pDay in msArray[stock].dividendInfo:
+				totalDiv+=mainStockArray[stock].dividendInfo
+	return totalDiv
+				
 	
 
 	
@@ -44,5 +50,6 @@ def everyDayInYear(day:int):
 	import datetime
 	return (datetime.datetime.today().date()-datetime.timedelta(day))
 	
-
+oDay=findOldestDay(msArray)
+o=totalDividendPaid(oDay)
 #totalDividendPaid()
