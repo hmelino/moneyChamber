@@ -6,7 +6,7 @@ import datetime
 
 def nextDividend(ticker,amount):
   today = datetime.date.today()
-  furebase=firebase.FirebaseApplication('"firebaseLinkRemoved"', None)
+  furebase=firebase.FirebaseApplication('https://dividenddatabase-503c0.firebaseio.com', None)
   o=furebase.get("/"+str(ticker),None)
   dateArray=[]
   for n in o.keys():
@@ -28,7 +28,7 @@ zum.close()
 
 
  
-furebase=firebase.FirebaseApplication('"firebaseLinkRemoved"', None)
+furebase=firebase.FirebaseApplication('https://dividenddatabase-503c0.firebaseio.com', None)
 for n in mainStockArray:
   name=n.ticker
   o=furebase.get("/"+str(name),None)

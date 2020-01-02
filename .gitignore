@@ -1,2 +1,8 @@
 *.pickle
+<<<<<<< HEAD
 sensData.py
+=======
+sensData.py
+.vscode/
+__pycache__/
+>>>>>>> e0d14e0e4e1bd6a4483ff8b64277247f67ef72fa
