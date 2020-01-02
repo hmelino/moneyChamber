@@ -1,8 +1,3 @@
-
-import buyInfo
-from buyInfo import *
-import dividendInfo
-from dividendInfo import *
 import ast
 
 def processStatementV4(msArray,source:str()):

@@ -1,4 +1,3 @@
-import downloadData
 from downloadData import oneTimeConnection
 import pickle
 import datetime

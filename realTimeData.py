@@ -1,10 +1,3 @@
-import requests
-import datetime
-from sensData import realTwebsite
-namesArray=['VUKE', 'VMID', 'PSN', 'HL', 'INVP', 'VOD', 'MKS', 'EVR', 'BT', 'LLOY', 'AV', 'PTEC', 'CREI', 'HMSO', 'CNCT']
-
-
-
 def getRealTimeData():
   dArray=[]
   todaysRealTime={}
@@ -24,7 +17,3 @@ def getRealTimeData():
           else:
            todaysRealTime[name]=price/100
   return todaysRealTime
-        
-
-
-
