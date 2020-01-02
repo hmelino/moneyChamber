@@ -1,10 +1,10 @@
-from msArrayObject import getMsArray
+from emailObject import getMsArray
 from realTimeData import getRealTimeData
-from processStatementInfo import processStatementV4
+from processBuyStatement import processStatementV4
 from historyProfit import historyProfit
 from historyDic import stockFloat,HistoryPrice
 from addTodaysPrices import addTodaysPrices
-from saveFile import saveMsArray
+#from saveFile import saveMsArray
 from graphFunctions import plotGraph
 from mainStockArray import updateStockAmountTotal
 import sys
@@ -29,7 +29,7 @@ totalFloat=historyProfit(msArray,stockFloat)
 addTodaysPrices(msArray)
 plotGraph(totalFloat)
 updateStockAmountTotal(msArray)
-saveMsArray(msArray)
+#saveMsArray(msArray)
 
 def totalDividendPaid(oldestDay):
 	import datetime
