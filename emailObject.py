@@ -1,5 +1,4 @@
 import datetime
-import emailData
 import sys
 import pickle
 from etfCheck import etfCheck
@@ -12,8 +11,8 @@ class StockV2():
 		
 def loadEmailData():
 	try:
-		from emailData import demData
-		return emailData.demData
+		from emailStatement import statement
+		return statement
 	except:
 		print("Missing Email Statement")
 		#function here to manually create email report
