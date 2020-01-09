@@ -1,6 +1,6 @@
 import traceback
 traceback.print_exc()
-from emailObject import getMsArray, saveMsArray
+from emailObject import getMsArray, saveMsArray , StockV2
 from realTimeData import getRealTimeData
 from processBuyStatement import processStatementV4
 from historyProfit import historyProfit
@@ -12,16 +12,6 @@ from mainStockArray import updateStockAmountTotal
 import sys
 
 msArray = getMsArray()
-
-def findOldestDay(msArray):
-	import datetime
-	oldestDay=datetime.datetime.today().date()
-	for stock in msArray:
-		day=msArray[stock].firstBuy.date()
-		if day < oldestDay:
-			oldestDay=day
-	return oldestDay
-
 
 	
 	
@@ -54,7 +44,7 @@ def everyDayInYear(day:int):
 	import datetime
 	return (datetime.datetime.today().date()-datetime.timedelta(day))
 	
-oDay=findOldestDay(msArray)
-o=totalDividendPaid(oDay)
+
+o=totalDividendPaid(StockV2.oldestDay)
 #totalDividendPaid()
 o=0

@@ -4,11 +4,17 @@ import pickle
 from etfCheck import etfCheck
 from emailStatement import statement
 
-class StockV2():
+class StockV2:
+	oldestDay=datetime.date.today()
+
 	def __init__(self,amount,firstBuy,price):
 		self.amount = amount
 		self.firstBuy = firstBuy
 		self.price = price
+
+		if StockV2.oldestDay > self.firstBuy.date():
+			StockV2.oldestDay=self.firstBuy.date()
+
 
 def getMsArray():
 	try:
