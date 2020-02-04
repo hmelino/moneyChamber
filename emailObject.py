@@ -15,7 +15,7 @@ class StockV2:
 		if StockV2.oldestDay > self.firstBuy.date():
 			StockV2.oldestDay=self.firstBuy.date()
 
-	def howManyDays(cls):
+	def howManyDays(self,cls):
 		return (datetime.date.today() - StockV2.oldestDay).days
 
 
