@@ -14,6 +14,7 @@ class HistoryPrice:
 		self.amount=amount
 		self.profit=profit
 		self.dividends=dividends
+		self.total=self.amount*self.basePrice
 		
 def freshData(stock):
 	jsonData=oneTimeConnection(stock)

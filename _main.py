@@ -42,7 +42,7 @@ def totalDividendPaid(oldestDay):
 	
 def everyDayInYear(day:int):
 	import datetime
-	return (datetime.datetime.today().date()-datetime.timedelta(day))
+	return (datetime.datetime.today().date()-datetime.timedelta(day)).days
 	
 
 o=totalDividendPaid(StockV2.oldestDay)
