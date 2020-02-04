@@ -1,4 +1,6 @@
 # moneyChamber
-Simple script written in Python to track stock portfolio.
+Python script for tracking stock portfolio, focused mostly on dividends and passive income.
+- offers portfolio graph which doesn't include deposits, giving an actual insight on performance base on stock price change and paid dividens only.
+- provide expected dividend payout for next 365 days based on previously received dividends.
 
-It takes text version from emailed monthly statement of Trading212 and process that data into object, adding history stock data and creating a graph.
+
