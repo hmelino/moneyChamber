@@ -1,7 +1,12 @@
 import requests
 import sensData 
 import pickle
-from sensData import apiKey
+import sys
+try:
+	from sensData import apiKey
+except ImportError:
+	print("Please insert your https://www.worldtradingdata.com/ apiKey into sensData.py as apiKey='your api key'")
+	sys.exit()
 
 def oneTimeConnection(stockName):
 	if stockName == "BT":
