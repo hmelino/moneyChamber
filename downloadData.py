@@ -1,7 +1,6 @@
 import requests
 import sensData 
 import pickle
-import sys
 from sensData import apiKey
 
 def oneTimeConnection(stockName):
