@@ -35,6 +35,5 @@ class MoneyChamber:
 			print(stock)
 			pPerformance=oneTimeConnection(stock)
 			
-
 o=MoneyChamber()
 pass
