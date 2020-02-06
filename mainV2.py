@@ -1,13 +1,12 @@
 import datetime
 import pickle
-from pastPerformance import oneTimeConnection
+from pastPerformance import historyPerformance
 today=datetime.datetime.today().date()
 
 class MoneyChamber:
 	db={}
 	def __init__(self):
 		self.loadStatement('statementV2.txt')
-		self.addPastPerformance()
 		
 	class Stock:
 		def __init__ (self,l):
@@ -16,6 +15,7 @@ class MoneyChamber:
 			self.amount=l[4]
 			self.name=l[5]
 			self.price=l[6]
+			self.history=historyPerformance(self.name,self.date.date())
 			
 		def processDate(self,l):
 			return datetime.datetime.strptime(l[2],'%Y.%m.%d %H:%M')
@@ -30,10 +30,6 @@ class MoneyChamber:
 				self.db[d[5]]=self.Stock(d)
 			pickle.dump(data,open("db.pickle","wb"))
 			
-	def addPastPerformance(self):
-		for stock in MoneyChamber.db.keys():
-			print(stock)
-			pPerformance=oneTimeConnection(stock)
 			
 o=MoneyChamber()
 pass
