@@ -39,11 +39,6 @@ class MoneyChamber:
 					totalForDay+=self.db[stockName].history[stringDay].profit
 			self.totalPortfolio[stringDay]=totalForDay
 
-
-
-
-
-
 	class Stock:
 		__etfs__=['VUKE','VMID']
 		def __init__ (self,l):
@@ -85,8 +80,6 @@ class MoneyChamber:
 			pickle.dump(self.db,open("db.pickle","wb"))
 		'''
 
-			
-	
 	def addPrices(self,stockName):
 		def oneTimeConnection(stockName=stockName):
 			dbYesterday=today-datetime.timedelta(2)

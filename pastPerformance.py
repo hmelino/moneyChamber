@@ -50,9 +50,6 @@ def processPastPerformance(firstDay,stockName,hDB):
 			print(stockPrice)
 		return Day(stockPrice,0,0,0)
 
-	def pastDayV2():
-		for 
-
 	today=datetime.datetime.today().date()
 	history=oneTimeConnection()
 	d={strDay(firstDay+datetime.timedelta(d)):pastDay(d,history,firstDay) for d in range((today-firstDay).days)}
