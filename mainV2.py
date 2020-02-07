@@ -29,7 +29,16 @@ class MoneyChamber:
 		def createOrders():
 			""" Create orders data if orders.py is not provided """
 			d=self.db
-			return {d[s].name:{strDay(d[s].date):[d[s].amount,d[s].price]} for s in d}
+			data={d[s].name:{strDay(d[s].date):[d[s].amount,d[s].price]} for s in d}
+
+			#adjust prices for non ETF
+			for stock in data.keys():
+				etfs=self.Stock.__etfs__
+				if stock not in etfs:
+					for date in data[stock].keys():
+						secondPart=data[stock][date]
+						secondPart[1]*=100
+			return data
 
 		try:
 			print("Loading orders")
@@ -42,8 +51,6 @@ class MoneyChamber:
 		except ImportError:
 			print('Create variable "data" inside of orders.py with all stock orders')
 			
-	def loadBuyStatement():
-		data=open('buyInfo.py','r')
 	def updateTotalPortfolio(self):
 		for day in range((today-self.oldestDay.date()).days):
 			stringDay=strDay(self.oldestDay+datetime.timedelta(day))
@@ -104,6 +111,7 @@ class MoneyChamber:
 				self.amount=amount
 				self.stockPrice=stockPrice
 				self.basePrice=basePrice
+				#print(f'{stockName}|{stockPrice}|{basePrice}|')
 		
 		def oneTimeConnection(stockName=stockName):
 			def importApiKey():
@@ -157,6 +165,7 @@ class MoneyChamber:
 				
 			if day in priceData:
 				stockPrice=float(priceData[day]['close'])
+			
 			self.db[stockName].history[day]=Day(basePrice,0,amount,stockPrice,etf)
 				
 o=MoneyChamber()
