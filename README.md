@@ -6,3 +6,8 @@ Python script for tracking stock portfolio, focused mostly on dividends and pass
 - provide expected dividend payout for next 365 days based on previously received dividends.
 
 
+#Known issues
+-need handling for realTimePrice missing link
+-2 days old prices for UK stocks - stock data provider doesnt provide them
+
+

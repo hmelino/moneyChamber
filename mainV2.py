@@ -2,34 +2,48 @@ import datetime
 import pickle
 import requests
 import sys
+from matplotlib import pyplot as plt
 
-def importApiKey():
-	try:
-		from sensData import apiKey
-		return apiKey
-	except ModuleNotFoundError:
-		print('Please create sensData.py file inside MoneyChamber folder')
-		sys.exit()
-	except ImportError:
-		print("Please create variable 'apiKey=your_worldtradingdata.com_api_key' inside sensData.py")
-		sys.exit()
-apiKey=importApiKey()
-
-today=datetime.datetime.today().date()
 def strDay(day):
-		return datetime.datetime.strftime(day,'%Y-%m-%d')
+	return datetime.datetime.strftime(day,'%Y-%m-%d')
+		
+today=datetime.datetime.today().date()
 
 class MoneyChamber:
 	totalPortfolio={}
 	oldestDay=None
 	db={}
+	orders=None
+	
 	def __init__(self):
 		self.loadStatement('statementV2.txt')
+		self.orders=self.loadOrders()
 		self.oldestDay=min([self.db[stock].date for stock in self.db])
 		for stock in self.db:
 			self.addPrices(stock)
 		self.updateTotalPortfolio()
+		plt.plot([v for v in self.totalPortfolio.values()])
+		plt.show()
 		
+	def loadOrders(self):
+		def createOrders():
+			""" Create orders data if orders.py is not provided """
+			d=self.db
+			return {d[s].name:{strDay(d[s].date):[d[s].amount,d[s].price]} for s in d}
+
+		try:
+			print("Loading orders")
+			from orders import data
+			return data
+			
+		except ModuleNotFoundError:
+			return createOrders()
+			
+		except ImportError:
+			print('Create variable "data" inside of orders.py with all stock orders')
+			
+	def loadBuyStatement():
+		data=open('buyInfo.py','r')
 	def updateTotalPortfolio(self):
 		for day in range((today-self.oldestDay.date()).days):
 			stringDay=strDay(self.oldestDay+datetime.timedelta(day))
@@ -79,9 +93,31 @@ class MoneyChamber:
 				MoneyChamber.db[d[5]]=self.Stock(d)
 			pickle.dump(self.db,open("db.pickle","wb"))
 		'''
-
 	def addPrices(self,stockName):
+		class Day:
+			def __init__(self,basePrice,dividend,amount,stockPrice,etf):
+				if etf == False:
+					stockPrice/=100
+					basePrice/=100
+				self.dividend=dividend
+				self.profit=round((stockPrice-basePrice)*amount,3)
+				self.amount=amount
+				self.stockPrice=stockPrice
+				self.basePrice=basePrice
+		
 		def oneTimeConnection(stockName=stockName):
+			def importApiKey():
+				try:
+					from sensData import apiKey
+					return apiKey
+				except ModuleNotFoundError:
+					print('Please create sensData.py file inside MoneyChamber folder')
+					sys.exit()
+				except ImportError:
+					print("Please create variable 'apiKey=your_worldtradingdata.com_api_key' inside sensData.py")
+					sys.exit()
+			
+			apiKey=importApiKey()
 			dbYesterday=today-datetime.timedelta(2)
 			if stockName == "BT":
 				stockName+=".A"
@@ -94,25 +130,34 @@ class MoneyChamber:
 				res=res['history']
 				print("Dowloaded "+str(stockName))
 				pickle.dump(res,open(f"pickle/{stockName}.pickle",'wb'))
-			return res		
-		
+			return res
+			
+		def newBasePrice():
+			if day != firstDay:
+				bfAmount=amount
+				newAmount,newPrice=orders[stockName][day]
+				bfPrice=basePrice
+				totalBefore=bfAmount*bfPrice
+				totalNew=newAmount*newPrice
+				totalAmount=bfAmount+newAmount
+				newBasePrice=(totalBefore+totalNew)/totalAmount
+				return round(newBasePrice,3),totalAmount
+			return basePrice,amount
+			
 		priceData=oneTimeConnection()
-
-		class Day:
-			def __init__(self,basePrice,dividend,amount,stockPrice):
-				self.dividend=dividend
-				self.profit=(stockPrice-basePrice)*amount
-
+		orders=self.orders
 		stockPrice=0
-		amount=float(self.db[stockName].amount)
-		basePrice=float(self.db[stockName].price)
+		firstDay=strDay(self.db[stockName].date)
+		amount=float(orders[stockName][firstDay][0])
+		basePrice=float(orders[stockName][firstDay][1])
+		etf=self.db[stockName].etf
 		for day in self.db[stockName].history.keys():
+			if day in orders[stockName]:
+				basePrice,amount=newBasePrice()
+				
 			if day in priceData:
 				stockPrice=float(priceData[day]['close'])
-				if self.db[stockName].etf is False:
-					stockPrice/=100
-			self.db[stockName].history[day]=Day(basePrice,0,amount,stockPrice)
+			self.db[stockName].history[day]=Day(basePrice,0,amount,stockPrice,etf)
 				
-
 o=MoneyChamber()
 pass
