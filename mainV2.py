@@ -18,13 +18,24 @@ class MoneyChamber:
 	def __init__(self):
 		self.loadStatement('statementV2.txt')
 		self.orders=self.loadOrders()
+		self.dividend=self.loadDividends()
 		self.oldestDay=min([self.db[stock].date for stock in self.db])
 		for stock in self.db:
 			self.addPrices(stock)
 		self.updateTotalPortfolio()
 		plt.plot([v for v in self.totalPortfolio.values()])
+		plt.axhline(0)
 		plt.show()
-		
+	def loadDividends(self):
+		try:
+			print("Loading orders")
+			from dividendPaid import data
+			return data
+
+		except ModuleNotFoundError:
+			print("Missing dividendPaid.py file")
+			return {}
+			
 	def loadOrders(self):
 		def createOrders():
 			""" Create orders data if orders.py is not provided """
@@ -71,6 +82,7 @@ class MoneyChamber:
 			buyRange=(today-self.date.date()).days
 			self.history={strDay((self.date+datetime.timedelta(d)).date()):0 for d in range(buyRange)}
 			self.updateETF()
+			self.dividendTotal=0
 
 		def processDate(self,l):
 			return datetime.datetime.strptime(l[2],'%Y.%m.%d %H:%M')
@@ -83,35 +95,23 @@ class MoneyChamber:
 				self.price/=100
 
 	def loadStatement(self,url):
-		''' just for testing '''
 		print('Created db')
 		data=open(url,'r').readlines()
 		result = [l.split('\t') for l in data]
 		for d in result:
 			MoneyChamber.db[d[5]]=self.Stock(d)
-		'''
-		try:
-			self.db=pickle.load(open("db.pickle","rb"))
-			print('Loaded')
-		except FileNotFoundError:
-			data=open(url,'r').readlines()
-			result = [l.split('\t') for l in data]
-			for d in result:
-				MoneyChamber.db[d[5]]=self.Stock(d)
-			pickle.dump(self.db,open("db.pickle","wb"))
-		'''
+
 	def addPrices(self,stockName):
 		class Day:
-			def __init__(self,basePrice,dividend,amount,stockPrice,etf):
+			def __init__(self,basePrice,amount,stockPrice,etf,dividend):
 				if etf == False:
 					stockPrice/=100
 					basePrice/=100
-				self.dividend=dividend
-				self.profit=round((stockPrice-basePrice)*amount,3)
+				self.profit=round(((stockPrice-basePrice)*amount)+dividend,3)
 				self.amount=amount
 				self.stockPrice=stockPrice
 				self.basePrice=basePrice
-				#print(f'{stockName}|{stockPrice}|{basePrice}|')
+				self.dividendPaid=dividend
 		
 		def oneTimeConnection(stockName=stockName):
 			def importApiKey():
@@ -143,7 +143,7 @@ class MoneyChamber:
 		def newBasePrice():
 			if day != firstDay:
 				bfAmount=amount
-				newAmount,newPrice=orders[stockName][day]
+				newAmount,newPrice=ordersData[stockName][day]
 				bfPrice=basePrice
 				totalBefore=bfAmount*bfPrice
 				totalNew=newAmount*newPrice
@@ -153,20 +153,26 @@ class MoneyChamber:
 			return basePrice,amount
 			
 		priceData=oneTimeConnection()
-		orders=self.orders
+		ordersData=self.orders
+		dividendsData=self.dividend
 		stockPrice=0
+		dividendTotal=0
 		firstDay=strDay(self.db[stockName].date)
-		amount=float(orders[stockName][firstDay][0])
-		basePrice=float(orders[stockName][firstDay][1])
+		amount=float(ordersData[stockName][firstDay][0])
+		basePrice=float(ordersData[stockName][firstDay][1])
 		etf=self.db[stockName].etf
 		for day in self.db[stockName].history.keys():
-			if day in orders[stockName]:
+			if dividendsData:
+				if day in dividendsData[stockName]:
+					dividendTotal+=dividendsData[stockName][day]
+
+			if day in ordersData[stockName]:
 				basePrice,amount=newBasePrice()
 				
 			if day in priceData:
 				stockPrice=float(priceData[day]['close'])
 			
-			self.db[stockName].history[day]=Day(basePrice,0,amount,stockPrice,etf)
+			self.db[stockName].history[day]=Day(basePrice,amount,stockPrice,etf,dividendTotal)
 				
 o=MoneyChamber()
 pass

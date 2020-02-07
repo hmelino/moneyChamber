@@ -5,9 +5,12 @@ Python script for tracking stock portfolio, focused mostly on dividends and pass
 - offers portfolio graph which doesn't include deposits, giving an actual insight on performance base on stock price change and paid dividens only.
 - provide expected dividend payout for next 365 days based on previously received dividends.
 
+##To Do List
+*deposits 
+*dividend analysis 
 
-#Known issues
--need handling for realTimePrice missing link
--2 days old prices for UK stocks - stock data provider doesnt provide them
+##Known issues
+*need handling for realTimePrice missing link
+*2 days old prices for UK stocks - as data stock provider is based in US 
 
 
