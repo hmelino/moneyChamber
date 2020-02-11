@@ -154,11 +154,6 @@ class CreatePortfolio:
 					print('Please create sensData.py file inside MoneyChamber folder and create variable apiKey="your_worldtradingdata.com_api_key" inside sensData.py')
 					sys.exit()
 
-				"""
-				except ImportError:
-					print("Please create variable 'apiKey=your_worldtradingdata.com_api_key' inside sensData.py")
-					sys.exit()
-			"""
 			apiKey=importApiKey()
 			todayUnixTime=time.time()
 			def downloadFreshStockData():
