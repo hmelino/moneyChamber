@@ -17,7 +17,7 @@ class CreatePortfolio:
 	orders=None
 	
 	def __init__(self):
-		self.loadStatement('statementV2.txt')
+		self.loadStatement('statement.txt')
 		self.orders=self.loadOrders()
 		self.dividend=self.loadDividends()
 		self.oldestDay=min([self.db[stock].date for stock in self.db])
@@ -30,22 +30,19 @@ class CreatePortfolio:
 		
 		try:
 			print("Loading dividends")
-			from MoneyChamber.dividendPaid import data
+			from moneyChamber.dividendPaid import data
 			return data
 		except ModuleNotFoundError:
 			print("Missing dividendPaid.py file")
 			return {}
 			
 	def graph(self):
-		def convertDate(s):
-			return 
 			
 		def xlabels():
-			multiplier=0.166
 			dates=list(self.totalPortfolio.keys())
 			tlen=len(dates)
 			datesLabels=[dates[int(tlen*(k*0.1999))] for k in range(6)]
-			fig,ax=plt.subplots()
+			_,ax=plt.subplots()
 			plt.plot([v for v in self.totalPortfolio.values()])
 			ax.set_xticklabels(datesLabels)
 		
@@ -93,7 +90,6 @@ class CreatePortfolio:
 		deposits=self.loadDeposits()
 		totalDeposits=0
 		for day in range((today-self.oldestDay.date()).days):
-			date=(self.oldestDay+datetime.timedelta(day)).date()
 			stringDay=strDay(self.oldestDay+datetime.timedelta(day))
 			totalForDay=0
 			if stringDay in deposits:
@@ -127,10 +123,12 @@ class CreatePortfolio:
 				self.price/=100
 
 	def loadStatement(self,url):
-		try:
-			data=open('MoneyChamber/statementV2.txt','r').readlines()
-		except FileNotFoundError:
-			data=open('statementV2.txt','r').readlines()
+		#data=open('statement.txt','r')
+		from pathlib import Path
+		print("File      Path:", Path(__file__).absolute())
+		print("Directory Path:", Path().absolute())  
+
+		data=open('moneyChamber/statement.txt','r')
 		result = [l.split('\t') for l in data]
 		for d in result:
 			self.db[d[5]]=self.Stock(d)
@@ -150,14 +148,12 @@ class CreatePortfolio:
 		def oneTimeConnection(stockName=stockName):
 			def importApiKey():
 				try:
-					from MoneyChamber.sensData import apiKey
+					from moneyChamber.sensData import apiKey
 					return apiKey
 				except ModuleNotFoundError:
-					from sensData import apiKey
-					return apiKey
-				else:
-					print('Please create sensData.py file inside MoneyChamber folder')
+					print('Please create sensData.py file inside MoneyChamber folder and create variable apiKey="your_worldtradingdata.com_api_key" inside sensData.py')
 					sys.exit()
+
 				"""
 				except ImportError:
 					print("Please create variable 'apiKey=your_worldtradingdata.com_api_key' inside sensData.py")
@@ -170,15 +166,12 @@ class CreatePortfolio:
 			
 			if stockName == "BT":
 				stockName+=".A"
-			path=f"pickle/{stockName}.pickle"
-			res=pickle.load(open(path,"rb"))
-
+			path=f"moneyChamber/pickle/{stockName}.pickle"
 			try:
-				path=f"pickle/{stockName}.pickle"
 				res=pickle.load(open(path,"rb"))
 				if todayUnixTime - os.path.getmtime(path) > 86400:
 					res=downloadFreshStockData()
-			except (KeyError):
+			except (FileNotFoundError):
 				res = downloadFreshStockData()
 				print("Downloaded "+str(stockName))
 				pickle.dump(res,open(f"pickle/{stockName}.pickle",'wb'))
