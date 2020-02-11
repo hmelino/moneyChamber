@@ -2,6 +2,8 @@ import datetime
 import pickle
 import requests
 import sys
+import os
+import time
 
 def strDay(day):
 	return datetime.datetime.strftime(day,'%Y-%m-%d')
@@ -56,9 +58,9 @@ class CreatePortfolio:
 		
 	def loadDeposits(self):
 		try:
-			from MoneyChamber.deposits import cashDeposits
+			from moneyChamber.deposits import cashDeposits
 			return cashDeposits
-		except FileNotFoundError:
+		except ModuleNotFoundError:
 			return []
 			
 	def loadOrders(self):
@@ -162,18 +164,24 @@ class CreatePortfolio:
 					sys.exit()
 			"""
 			apiKey=importApiKey()
-			dbYesterday=today-datetime.timedelta(2)
+			todayUnixTime=time.time()
+			def downloadFreshStockData():
+				return requests.get(f'https://api.worldtradingdata.com/api/v1/history?symbol={stockName}.L&sort=newest&api_token={apiKey}').json()['history']
+			
 			if stockName == "BT":
 				stockName+=".A"
+			path=f"pickle/{stockName}.pickle"
+			res=pickle.load(open(path,"rb"))
+
 			try:
-				res=pickle.load(open(f"MoneyChamber/pickle/{stockName}.pickle","rb"))
-				res[strDay(dbYesterday)]
-				print(f"Loaded {stockName}")
-			except (FileNotFoundError,KeyError):
-				res = requests.get(f'https://api.worldtradingdata.com/api/v1/history?symbol={stockName}.L&sort=newest&api_token={apiKey}').json()
-				res=res['history']
-				print("Dowloaded "+str(stockName))
-				pickle.dump(res,open(f"MoneyChamber/pickle/{stockName}.pickle",'wb'))
+				path=f"pickle/{stockName}.pickle"
+				res=pickle.load(open(path,"rb"))
+				if todayUnixTime - os.path.getmtime(path) > 86400:
+					res=downloadFreshStockData()
+			except (KeyError):
+				res = downloadFreshStockData()
+				print("Downloaded "+str(stockName))
+				pickle.dump(res,open(f"pickle/{stockName}.pickle",'wb'))
 			return res
 			
 		def newBasePrice():
