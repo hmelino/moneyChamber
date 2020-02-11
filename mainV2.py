@@ -2,14 +2,13 @@ import datetime
 import pickle
 import requests
 import sys
-from matplotlib import pyplot as plt
 
 def strDay(day):
 	return datetime.datetime.strftime(day,'%Y-%m-%d')
 		
 today=datetime.datetime.today().date()
 
-class MoneyChamber:
+class CreatePortfolio:
 	totalPortfolio={}
 	oldestDay=None
 	db={}
@@ -23,18 +22,44 @@ class MoneyChamber:
 		for stock in self.db:
 			self.addPrices(stock)
 		self.updateTotalPortfolio()
-		plt.plot([v for v in self.totalPortfolio.values()])
-		plt.axhline(0)
-		plt.show()
+		self.graph()
+		
 	def loadDividends(self):
+		
 		try:
-			print("Loading orders")
-			from dividendPaid import data
+			print("Loading dividends")
+			from MoneyChamber.dividendPaid import data
 			return data
-
 		except ModuleNotFoundError:
 			print("Missing dividendPaid.py file")
 			return {}
+			
+	def graph(self):
+		def convertDate(s):
+			return 
+			
+		def xlabels():
+			multiplier=0.166
+			dates=list(self.totalPortfolio.keys())
+			tlen=len(dates)
+			datesLabels=[dates[int(tlen*(k*0.1999))] for k in range(6)]
+			fig,ax=plt.subplots()
+			plt.plot([v for v in self.totalPortfolio.values()])
+			ax.set_xticklabels(datesLabels)
+		
+		from matplotlib import pyplot as plt
+		xlabels()
+		plt.axhline(0)
+		plt.xlabel("Date")
+		plt.show()
+		xlabels()
+		
+	def loadDeposits(self):
+		try:
+			from MoneyChamber.deposits import cashDeposits
+			return cashDeposits
+		except FileNotFoundError:
+			return []
 			
 	def loadOrders(self):
 		def createOrders():
@@ -53,7 +78,7 @@ class MoneyChamber:
 
 		try:
 			print("Loading orders")
-			from orders import data
+			from MoneyChamber.orders import data
 			return data
 			
 		except ModuleNotFoundError:
@@ -63,9 +88,14 @@ class MoneyChamber:
 			print('Create variable "data" inside of orders.py with all stock orders')
 			
 	def updateTotalPortfolio(self):
+		deposits=self.loadDeposits()
+		totalDeposits=0
 		for day in range((today-self.oldestDay.date()).days):
+			date=(self.oldestDay+datetime.timedelta(day)).date()
 			stringDay=strDay(self.oldestDay+datetime.timedelta(day))
 			totalForDay=0
+			if stringDay in deposits:
+					totalDeposits+=deposits[stringDay]
 			for stockName in self.db:
 				if stringDay in self.db[stockName].history:
 					totalForDay+=self.db[stockName].history[stringDay].profit
@@ -95,11 +125,13 @@ class MoneyChamber:
 				self.price/=100
 
 	def loadStatement(self,url):
-		print('Created db')
-		data=open(url,'r').readlines()
+		try:
+			data=open('MoneyChamber/statementV2.txt','r').readlines()
+		except FileNotFoundError:
+			data=open('statementV2.txt','r').readlines()
 		result = [l.split('\t') for l in data]
 		for d in result:
-			MoneyChamber.db[d[5]]=self.Stock(d)
+			self.db[d[5]]=self.Stock(d)
 
 	def addPrices(self,stockName):
 		class Day:
@@ -116,28 +148,32 @@ class MoneyChamber:
 		def oneTimeConnection(stockName=stockName):
 			def importApiKey():
 				try:
-					from sensData import apiKey
+					from MoneyChamber.sensData import apiKey
 					return apiKey
 				except ModuleNotFoundError:
+					from sensData import apiKey
+					return apiKey
+				else:
 					print('Please create sensData.py file inside MoneyChamber folder')
 					sys.exit()
+				"""
 				except ImportError:
 					print("Please create variable 'apiKey=your_worldtradingdata.com_api_key' inside sensData.py")
 					sys.exit()
-			
+			"""
 			apiKey=importApiKey()
 			dbYesterday=today-datetime.timedelta(2)
 			if stockName == "BT":
 				stockName+=".A"
 			try:
-				res=pickle.load(open(f"pickle/{stockName}.pickle","rb"))
+				res=pickle.load(open(f"MoneyChamber/pickle/{stockName}.pickle","rb"))
 				res[strDay(dbYesterday)]
 				print(f"Loaded {stockName}")
 			except (FileNotFoundError,KeyError):
 				res = requests.get(f'https://api.worldtradingdata.com/api/v1/history?symbol={stockName}.L&sort=newest&api_token={apiKey}').json()
 				res=res['history']
 				print("Dowloaded "+str(stockName))
-				pickle.dump(res,open(f"pickle/{stockName}.pickle",'wb'))
+				pickle.dump(res,open(f"MoneyChamber/pickle/{stockName}.pickle",'wb'))
 			return res
 			
 		def newBasePrice():
@@ -151,7 +187,7 @@ class MoneyChamber:
 				newBasePrice=(totalBefore+totalNew)/totalAmount
 				return round(newBasePrice,3),totalAmount
 			return basePrice,amount
-			
+		
 		priceData=oneTimeConnection()
 		ordersData=self.orders
 		dividendsData=self.dividend
@@ -171,8 +207,7 @@ class MoneyChamber:
 				
 			if day in priceData:
 				stockPrice=float(priceData[day]['close'])
-			
 			self.db[stockName].history[day]=Day(basePrice,amount,stockPrice,etf,dividendTotal)
 				
-o=MoneyChamber()
+
 pass
