@@ -27,7 +27,6 @@ class CreatePortfolio:
 		self.graph()
 		
 	def loadDividends(self):
-		
 		try:
 			print("Loading dividends")
 			from moneyChamber.dividendPaid import data
@@ -123,10 +122,6 @@ class CreatePortfolio:
 				self.price/=100
 
 	def loadStatement(self,url):
-		#data=open('statement.txt','r')
-		from pathlib import Path
-		print("File      Path:", Path(__file__).absolute())
-		print("Directory Path:", Path().absolute())  
 
 		data=open('moneyChamber/statement.txt','r')
 		result = [l.split('\t') for l in data]
@@ -169,7 +164,7 @@ class CreatePortfolio:
 			except (FileNotFoundError):
 				res = downloadFreshStockData()
 				print("Downloaded "+str(stockName))
-				pickle.dump(res,open(f"pickle/{stockName}.pickle",'wb'))
+				pickle.dump(res,open(f"moneyChamber/pickle/{stockName}.pickle",'wb'))
 			return res
 			
 		def newBasePrice():
