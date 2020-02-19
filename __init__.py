@@ -1,1 +1,1 @@
-from moneyChamber.mainV2 import CreatePortfolio
+from .mainV2 import Portfolio

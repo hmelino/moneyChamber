@@ -31,15 +31,15 @@ apiKey='your_worldtradingdata_api_key'
 > Import the package 
 
 ```Python
-from moneyChamber import CreatePortfolio
+import moneyChamber
 ```
 
 > Initialize new object with CreatePortfolio() function and run the code.
 
 ```Python
-retirementPortfolio = CreatePortfolio()
+retirementPortfolio = moneyChamber.Portfolio()
 ```
->Output will be graph of your portfolio.
+>Output will be performance graph of your portfolio.
 
 
 ## Contact

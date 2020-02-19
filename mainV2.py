@@ -10,11 +10,12 @@ def strDay(day):
 		
 today=datetime.datetime.today().date()
 
-class CreatePortfolio:
+class Portfolio:
 	totalPortfolio={}
 	oldestDay=None
 	db={}
 	orders=None
+	profit=0
 	
 	def __init__(self):
 		self.loadStatement('statement.txt')
@@ -25,10 +26,11 @@ class CreatePortfolio:
 			self.addPrices(stock)
 		self.updateTotalPortfolio()
 		self.graph()
+		self.profit=list(self.totalPortfolio.values())[-1]
 		
 	def loadDividends(self):
 		try:
-			print("Loading dividends")
+			#print("Loading dividends")
 			from moneyChamber.dividendPaid import data
 			return data
 		except ModuleNotFoundError:
@@ -36,21 +38,26 @@ class CreatePortfolio:
 			return {}
 			
 	def graph(self):
-			
-		def xlabels():
-			dates=list(self.totalPortfolio.keys())
-			tlen=len(dates)
-			datesLabels=[dates[int(tlen*(k*0.1999))] for k in range(6)]
-			_,ax=plt.subplots()
-			plt.plot([v for v in self.totalPortfolio.values()])
-			ax.set_xticklabels(datesLabels)
-		
+		from moneyChamber.profitLossGraph import optimizeData
+		import numpy as np
 		from matplotlib import pyplot as plt
-		xlabels()
-		plt.axhline(0)
+		spacing=5
+		dayValues=[v for v in self.totalPortfolio.values()]
+		dates=list(self.totalPortfolio.keys())
+		datesArray=dates
+		_,ax=plt.subplots()
+		
+		profit,loss=optimizeData(dayValues)
+		datesSpacing=int(len(dates)/(spacing))
+		datesTicks=[dates[v*datesSpacing] for v in range(spacing)]
+		datesTicks.insert(0,0)
+		datesTicks.append(dates[-1])
+		plt.plot(profit,linewidth=2,color='#57900b')
+		plt.plot(loss,linewidth=2,color='#d30808')
+		ax.xaxis.set_major_locator(plt.MultipleLocator(len(profit)/spacing))
+		ax.set_xticklabels(datesTicks)
 		plt.xlabel("Date")
 		plt.show()
-		xlabels()
 		
 	def loadDeposits(self):
 		try:
@@ -75,7 +82,7 @@ class CreatePortfolio:
 			return data
 
 		try:
-			print("Loading orders")
+			#print("Loading orders")
 			from MoneyChamber.orders import data
 			return data
 			
@@ -152,7 +159,11 @@ class CreatePortfolio:
 			apiKey=importApiKey()
 			todayUnixTime=time.time()
 			def downloadFreshStockData():
-				return requests.get(f'https://api.worldtradingdata.com/api/v1/history?symbol={stockName}.L&sort=newest&api_token={apiKey}').json()['history']
+				try:
+					data=requests.get(f'https://api.worldtradingdata.com/api/v1/history?symbol={stockName}.L&sort=newest&api_token={apiKey}').json()['history']
+					return data
+				except ConnectionError:
+					print('Connection error')
 			
 			if stockName == "BT":
 				stockName+=".A"
@@ -161,9 +172,12 @@ class CreatePortfolio:
 				res=pickle.load(open(path,"rb"))
 				if todayUnixTime - os.path.getmtime(path) > 86400:
 					res=downloadFreshStockData()
+					#print(f"Old data for {stockName}, dowloaded new one")
+					pickle.dump(res,open(path,'wb'))
 			except (FileNotFoundError):
+				#print(f"didnt find saved {stockName}")
 				res = downloadFreshStockData()
-				print("Downloaded "+str(stockName))
+				#print("Downloaded "+str(stockName))
 				pickle.dump(res,open(f"moneyChamber/pickle/{stockName}.pickle",'wb'))
 			return res
 			
@@ -192,6 +206,7 @@ class CreatePortfolio:
 			if dividendsData:
 				if day in dividendsData[stockName]:
 					dividendTotal+=dividendsData[stockName][day]
+					self.db[stockName].dividendTotal+=dividendsData[stockName][day]
 
 			if day in ordersData[stockName]:
 				basePrice,amount=newBasePrice()
