@@ -48,15 +48,62 @@ class Portfolio:
 		_,ax=plt.subplots()
 		
 		profit,loss=optimizeData(dayValues)
-		datesSpacing=int(len(dates)/(spacing))
-		datesTicks=[dates[v*datesSpacing] for v in range(spacing)]
+		dMultiplier=int(len(dates)/(spacing))
+		datesTicks=[dates[v*dMultiplier] for v in range(spacing)]
 		datesTicks.insert(0,0)
 		datesTicks.append(dates[-1])
-		plt.plot(profit,linewidth=2,color='#57900b')
-		plt.plot(loss,linewidth=2,color='#d30808')
+		plt.plot(profit,linewidth=2,color='#7AA8AC',label='Profit')
+		plt.plot(loss,linewidth=2,color='#C56C74',label='Loss')
+		#print(plt.rcParams.keys())
+		bgColor='#154F55'
+		plt.rcParams['axes.facecolor']=bgColor
+		plt.rcParams['axes.edgecolor']=bgColor
+		plt.rcParams['figure.facecolor']=bgColor
+		plt.rcParams['figure.edgecolor']=bgColor
+		plt.rcParams['savefig.facecolor']=bgColor
+		plt.rcParams['savefig.edgecolor']=bgColor
+		plt.rcParams['text.color']='white'
+		plt.rcParams['xtick.color']='white'
+		plt.rcParams['ytick.color']='white'
+		plt.rcParams['patch.edgecolor']='red'
+		plt.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='on', labelleft='on')
+		plt.rcParams['legend.loc']='upper left'
+		
+		
+		multiplierV2=len(profit)/len(list(self.totalPortfolio.keys()))
+		
+		def showMonths():
+			#list with first day of month index N
+			fDayPositions=[]
+			pDates=list(self.totalPortfolio.keys())
+			for day in range(len(pDates)):
+				if pDates[day][8:10]=='01':
+					fDayPositions.append(day)
+			fDayPositionsX=[v*multiplierV2 for v in fDayPositions]
+			for n in fDayPositionsX:
+				plt.axvline(n,color='white',alpha=0.1)
+		def showYears():
+			nYPositions={}
+			pDates=list(self.totalPortfolio.keys())
+			savedYear=pDates[0][0:4]
+			#nYPositions.append(savedYear)
+			for d in range(len(pDates)):
+				if pDates[d][0:4]!=savedYear:
+					savedYear=pDates[d][0:4]
+					nYPositions[savedYear]=d
+			for year in nYPositions.values():
+				plt.axvline(year*multiplierV2,color='white',alpha=0.5)
+			
+				
+			
+			
+		showYears()
+		showMonths()
+		
+		
 		ax.xaxis.set_major_locator(plt.MultipleLocator(len(profit)/spacing))
 		ax.set_xticklabels(datesTicks)
-		plt.xlabel("Date")
+		plt.legend()
 		plt.show()
 		
 	def loadDeposits(self):
