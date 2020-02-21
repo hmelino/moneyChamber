@@ -37,7 +37,11 @@ class Portfolio:
 			print("Missing dividendPaid.py file")
 			return {}
 			
-	def graph(self):
+	def graph(self,style='armyBlue'):
+		cStyles={'armyBlue':['#92C099','#C54E59','#304154'],
+		'darkGreen':['#92C099','#C54E59','#154F55']
+		}
+		
 		from moneyChamber.profitLossGraph import optimizeData
 		import numpy as np
 		from matplotlib import pyplot as plt
@@ -49,13 +53,11 @@ class Portfolio:
 		
 		profit,loss=optimizeData(dayValues)
 		dMultiplier=int(len(dates)/(spacing))
-		datesTicks=[dates[v*dMultiplier] for v in range(spacing)]
-		datesTicks.insert(0,0)
-		datesTicks.append(dates[-1])
-		plt.plot(profit,linewidth=2,color='#7AA8AC',label='Profit')
-		plt.plot(loss,linewidth=2,color='#C56C74',label='Loss')
+		#datesTicks=[dates[v*dMultiplier] for v in range(spacing)]
+		#datesTicks.insert(0,0)
+		#datesTicks.append(dates[-1])
 		#print(plt.rcParams.keys())
-		bgColor='#154F55'
+		bgColor=cStyles[style][2]
 		plt.rcParams['axes.facecolor']=bgColor
 		plt.rcParams['axes.edgecolor']=bgColor
 		plt.rcParams['figure.facecolor']=bgColor
@@ -69,6 +71,8 @@ class Portfolio:
 		plt.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='on', labelleft='on')
 		plt.rcParams['legend.loc']='upper left'
 		
+		plt.plot(profit,linewidth=2,color=cStyles[style][0],label='Profit')
+		plt.plot(loss,linewidth=2,color=cStyles[style][1],label='Loss')
 		
 		multiplierV2=len(profit)/len(list(self.totalPortfolio.keys()))
 		
@@ -82,27 +86,24 @@ class Portfolio:
 			fDayPositionsX=[v*multiplierV2 for v in fDayPositions]
 			for n in fDayPositionsX:
 				plt.axvline(n,color='white',alpha=0.1)
+				
 		def showYears():
 			nYPositions={}
 			pDates=list(self.totalPortfolio.keys())
 			savedYear=pDates[0][0:4]
-			#nYPositions.append(savedYear)
+			y=min(loss)-5
 			for d in range(len(pDates)):
 				if pDates[d][0:4]!=savedYear:
 					savedYear=pDates[d][0:4]
 					nYPositions[savedYear]=d
-			for year in nYPositions.values():
-				plt.axvline(year*multiplierV2,color='white',alpha=0.5)
-			
-				
-			
-			
+			print(nYPositions)
+			for year in nYPositions.keys():
+				x=nYPositions[year]*multiplierV2
+				plt.axvline(x,color='white',alpha=0.5)
+				ax.annotate(year,xy=(x+200,y))
 		showYears()
 		showMonths()
-		
-		
 		ax.xaxis.set_major_locator(plt.MultipleLocator(len(profit)/spacing))
-		ax.set_xticklabels(datesTicks)
 		plt.legend()
 		plt.show()
 		
