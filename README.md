@@ -3,7 +3,17 @@
 > Stock portfolio with clear performance graph.
 
 ## Why use moneyChamber ?
-With moneyChamber you will get clear view on portfolio performance which is based entirely on stock price changes and dividends payments. It doesnt include deposits as most portfolios does, which is usually confusing. 
+While most stock portfolios looks like this:
+[![bad portfolio](https://i.ibb.co/t8bSQYY/Figure-2.png)]()
+The always going up trend looks amazing, makes you feel like since you started you made loads of money, but all you see are (mostly) your deposits. 
+
+Portfolios should look more like this:
+[![good portfolio](https://i.ibb.co/5Lgvfkb/Figure-1.png)]()
+Performance based only on price movement and received dividends.
+
+That looks much more realistic, right ? 
+
+
 
 ## Installation
 ### Clone
@@ -24,7 +34,7 @@ apiKey='your_worldtradingdata_api_key'
 2	POS123456788	2018.10.26 10:02	Buy	1	VMID	29.435				33.305	3.87	0
 3	POS123456787	2018.12.10 10:00	Buy	5	PSN	2213.6				3054	42.02	0
 ```
-- You can usually get statement like from Trading212 monthly email statement, or you can manually adjust/add values from this example statement.
+- This statement can be recieved as monthly Trading212 email statement, or can be manually added/adjusted.
 
 ## Use
 
@@ -45,5 +55,5 @@ retirementPortfolio = moneyChamber.Portfolio()
 ## Contact
 
 - Website at <a href="https://github.com/hmelino" target="_blank">`https://github.com/hmelino`</a>
-
+- If you have got any issues or ideas for this package, or just wanna say hello :), email me at hmelino.github@gmail.com
 

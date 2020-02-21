@@ -11,23 +11,34 @@ def strDay(day):
 today=datetime.datetime.today().date()
 
 class Portfolio:
+	import matplotlib.pyplot
+	plt=matplotlib.pyplot
 	totalPortfolio={}
 	oldestDay=None
 	db={}
-	orders=None
 	profit=0
+	totalDividendsDict={}
+	
 	
 	def __init__(self):
 		self.loadStatement('statement.txt')
-		self.orders=self.loadOrders()
-		self.dividend=self.loadDividends()
+		self.depositsData=self.loadDeposits()
+		self.ordersData=self.loadOrders()
+		self.dividendData=self.loadDividends()
 		self.oldestDay=min([self.db[stock].date for stock in self.db])
 		for stock in self.db:
 			self.addPrices(stock)
 		self.updateTotalPortfolio()
 		self.graph()
 		self.profit=list(self.totalPortfolio.values())[-1]
-		
+	def loadDeposits(self):
+		try:
+			from moneyChamber.deposits import data
+			return data
+		except ModuleNotFoundError:
+			print("Missing deposits.py file")
+			return {}
+
 	def loadDividends(self):
 		try:
 			#print("Loading dividends")
@@ -38,44 +49,20 @@ class Portfolio:
 			return {}
 			
 	def graph(self,style='armyBlue'):
+		from moneyChamber.profitLossGraph import optimizeData
+		import numpy as np
+		dayValues=[v for v in self.totalPortfolio.values()]
+		profit,loss=optimizeData(dayValues)
 		cStyles={'armyBlue':['#92C099','#C54E59','#304154'],
 		'darkGreen':['#92C099','#C54E59','#154F55']
 		}
-		
-		from moneyChamber.profitLossGraph import optimizeData
-		import numpy as np
-		from matplotlib import pyplot as plt
-		spacing=5
-		dayValues=[v for v in self.totalPortfolio.values()]
-		dates=list(self.totalPortfolio.keys())
-		datesArray=dates
-		_,ax=plt.subplots()
-		
-		profit,loss=optimizeData(dayValues)
-		dMultiplier=int(len(dates)/(spacing))
-		#datesTicks=[dates[v*dMultiplier] for v in range(spacing)]
-		#datesTicks.insert(0,0)
-		#datesTicks.append(dates[-1])
-		#print(plt.rcParams.keys())
-		bgColor=cStyles[style][2]
-		plt.rcParams['axes.facecolor']=bgColor
-		plt.rcParams['axes.edgecolor']=bgColor
-		plt.rcParams['figure.facecolor']=bgColor
-		plt.rcParams['figure.edgecolor']=bgColor
-		plt.rcParams['savefig.facecolor']=bgColor
-		plt.rcParams['savefig.edgecolor']=bgColor
-		plt.rcParams['text.color']='white'
-		plt.rcParams['xtick.color']='white'
-		plt.rcParams['ytick.color']='white'
-		plt.rcParams['patch.edgecolor']='red'
-		plt.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='on', labelleft='on')
-		plt.rcParams['legend.loc']='upper left'
-		
-		plt.plot(profit,linewidth=2,color=cStyles[style][0],label='Profit')
-		plt.plot(loss,linewidth=2,color=cStyles[style][1],label='Loss')
-		
-		multiplierV2=len(profit)/len(list(self.totalPortfolio.keys()))
-		
+		def dividendGraph():
+			dividendPlotData=[]
+			for day in self.totalDividendsDict.keys():
+				for _ in range(int(multiplierV2)):
+					dividendPlotData.append(self.totalDividendsDict[day])
+			return dividendPlotData
+
 		def showMonths():
 			#list with first day of month index N
 			fDayPositions=[]
@@ -85,9 +72,9 @@ class Portfolio:
 					fDayPositions.append(day)
 			fDayPositionsX=[v*multiplierV2 for v in fDayPositions]
 			for n in fDayPositionsX:
-				plt.axvline(n,color='white',alpha=0.1)
+				self.plt.axvline(n,color='white',alpha=0.1)
 				
-		def showYears():
+		def showYears():	
 			nYPositions={}
 			pDates=list(self.totalPortfolio.keys())
 			savedYear=pDates[0][0:4]
@@ -96,27 +83,46 @@ class Portfolio:
 				if pDates[d][0:4]!=savedYear:
 					savedYear=pDates[d][0:4]
 					nYPositions[savedYear]=d
-			print(nYPositions)
 			for year in nYPositions.keys():
 				x=nYPositions[year]*multiplierV2
-				plt.axvline(x,color='white',alpha=0.5)
-				ax.annotate(year,xy=(x+200,y))
-		showYears()
-		showMonths()
-		ax.xaxis.set_major_locator(plt.MultipleLocator(len(profit)/spacing))
-		plt.legend()
-		plt.show()
+				self.plt.axvline(x,color='white',alpha=0.5)
+				self.plt.annotate(year,xy=(x+200,y))
+				#ax.annotate
+
+		def prettyGraph():
+			bgColor=cStyles[style][2]
+			self.plt.rcParams['axes.facecolor']=bgColor
+			self.plt.rcParams['axes.edgecolor']=bgColor
+			self.plt.rcParams['figure.facecolor']=bgColor
+			self.plt.rcParams['figure.edgecolor']=bgColor
+			self.plt.rcParams['savefig.facecolor']=bgColor
+			self.plt.rcParams['savefig.edgecolor']=bgColor
+			self.plt.rcParams['text.color']='white'
+			self.plt.rcParams['xtick.color']=bgColor
+			self.plt.rcParams['ytick.color']='white'
+			self.plt.rcParams['patch.edgecolor']='red'
+			self.plt.rcParams['legend.loc']='upper left'
+			self.plt.rcParams.update
 		
-	def loadDeposits(self):
-		try:
-			from moneyChamber.deposits import cashDeposits
-			return cashDeposits
-		except ModuleNotFoundError:
-			return []
+		prettyGraph()
+		self.plt.plot(profit,linewidth=2,color=cStyles[style][0],label='Profit')
+		self.plt.plot(loss,linewidth=2,color=cStyles[style][1],label='Loss')
+		#_,ax=self.plt.subplots()
+		self.plt.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='on', labelleft='on')
+		self.plt.legend()
+		multiplierV2=len(profit)/len(list(self.totalPortfolio.keys()))
+		showMonths()
+		showYears()
+		dividends=dividendGraph()
+		dividendsX=[0 for v in range(len(dividends))]
+		#self.plt.fill_between(dividendsX,dividends)
+		#self.plt.plot(dividends,alpha=0.2, color='white')
+		self.plt.show()
 			
 	def loadOrders(self):
 		def createOrders():
 			""" Create orders data if orders.py is not provided """
+			print('Creating orders data')
 			d=self.db
 			data={d[s].name:{strDay(d[s].date):[d[s].amount,d[s].price]} for s in d}
 
@@ -130,8 +136,7 @@ class Portfolio:
 			return data
 
 		try:
-			#print("Loading orders")
-			from MoneyChamber.orders import data
+			from moneyChamber.orders import data
 			return data
 			
 		except ModuleNotFoundError:
@@ -141,17 +146,21 @@ class Portfolio:
 			print('Create variable "data" inside of orders.py with all stock orders')
 			
 	def updateTotalPortfolio(self):
-		deposits=self.loadDeposits()
 		totalDeposits=0
+		totalDividends=0
 		for day in range((today-self.oldestDay.date()).days):
 			stringDay=strDay(self.oldestDay+datetime.timedelta(day))
 			totalForDay=0
-			if stringDay in deposits:
-					totalDeposits+=deposits[stringDay]
+			if stringDay in self.depositsData:
+					totalDeposits+=self.depositsData[stringDay]
 			for stockName in self.db:
 				if stringDay in self.db[stockName].history:
 					totalForDay+=self.db[stockName].history[stringDay].profit
+				if stringDay in self.dividendData[stockName]:
+					totalDividends+=self.dividendData[stockName][stringDay]
 			self.totalPortfolio[stringDay]=totalForDay
+			self.totalDividendsDict[stringDay]=totalDividends
+
 
 	class Stock:
 		__etfs__=['VUKE','VMID']
@@ -178,14 +187,14 @@ class Portfolio:
 
 	def loadStatement(self,url):
 
-		data=open('moneyChamber/statement.txt','r')
+		data=open(os.path.join(os.path.dirname(__file__),'statement.txt'),'r')
 		result = [l.split('\t') for l in data]
 		for d in result:
 			self.db[d[5]]=self.Stock(d)
 
 	def addPrices(self,stockName):
 		class Day:
-			def __init__(self,basePrice,amount,stockPrice,etf,dividend):
+			def __init__(self,basePrice,amount,stockPrice,etf,dividend,deposits):
 				if etf == False:
 					stockPrice/=100
 					basePrice/=100
@@ -194,6 +203,7 @@ class Portfolio:
 				self.stockPrice=stockPrice
 				self.basePrice=basePrice
 				self.dividendPaid=dividend
+				self.totalDeposits=deposits
 		
 		def oneTimeConnection(stockName=stockName):
 			def importApiKey():
@@ -213,11 +223,12 @@ class Portfolio:
 				except ConnectionError:
 					print('Connection error')
 			
+			path=os.path.join(os.path.dirname(__file__),f"pickle/{stockName}.pickle")
 			if stockName == "BT":
 				stockName+=".A"
-			path=f"moneyChamber/pickle/{stockName}.pickle"
 			try:
-				res=pickle.load(open(path,"rb"))
+				res=pickle.load(open(path,'rb'))
+				pickle.dump(res,open(path,'wb'))
 				if todayUnixTime - os.path.getmtime(path) > 86400:
 					res=downloadFreshStockData()
 					#print(f"Old data for {stockName}, dowloaded new one")
@@ -226,13 +237,13 @@ class Portfolio:
 				#print(f"didnt find saved {stockName}")
 				res = downloadFreshStockData()
 				#print("Downloaded "+str(stockName))
-				pickle.dump(res,open(f"moneyChamber/pickle/{stockName}.pickle",'wb'))
+				pickle.dump(res,open(path,'wb'))
 			return res
 			
 		def newBasePrice():
 			if day != firstDay:
 				bfAmount=amount
-				newAmount,newPrice=ordersData[stockName][day]
+				newAmount,newPrice=self.ordersData[stockName][day]
 				bfPrice=basePrice
 				totalBefore=bfAmount*bfPrice
 				totalNew=newAmount*newPrice
@@ -241,27 +252,31 @@ class Portfolio:
 				return round(newBasePrice,3),totalAmount
 			return basePrice,amount
 		
+		totalStockDividends=0
 		priceData=oneTimeConnection()
-		ordersData=self.orders
-		dividendsData=self.dividend
 		stockPrice=0
-		dividendTotal=0
 		firstDay=strDay(self.db[stockName].date)
-		amount=float(ordersData[stockName][firstDay][0])
-		basePrice=float(ordersData[stockName][firstDay][1])
+		amount=float(self.ordersData[stockName][firstDay][0])
+		basePrice=float(self.ordersData[stockName][firstDay][1])
 		etf=self.db[stockName].etf
 		for day in self.db[stockName].history.keys():
-			if dividendsData:
-				if day in dividendsData[stockName]:
-					dividendTotal+=dividendsData[stockName][day]
-					self.db[stockName].dividendTotal+=dividendsData[stockName][day]
 
-			if day in ordersData[stockName]:
+			# add dividends 
+			if self.dividendData:
+				if day in self.dividendData[stockName]:
+					totalStockDividends+=self.dividendData[stockName][day]
+					self.db[stockName].dividendTotal+=totalStockDividends
+			#update amount
+			if self.depositsData:
+				#toBeFinished
+				pass
+			#count new base price
+			if day in self.ordersData[stockName]:
 				basePrice,amount=newBasePrice()
-				
+			#update stock price if markets were opened
 			if day in priceData:
 				stockPrice=float(priceData[day]['close'])
-			self.db[stockName].history[day]=Day(basePrice,amount,stockPrice,etf,dividendTotal)
+			self.db[stockName].history[day]=Day(basePrice,amount,stockPrice,etf,totalStockDividends,0)
 				
 
 pass
