@@ -52,14 +52,14 @@ class Portfolio:
 		from moneyChamber.profitLossGraph import optimizeData
 		import numpy as np
 		dayValues=[v for v in self.totalPortfolio.values()]
-		profit,loss=optimizeData(dayValues)
+		profit,loss,normal=optimizeData(dayValues)
 		cStyles={'armyBlue':['#92C099','#C54E59','#304154'],
 		'darkGreen':['#92C099','#C54E59','#154F55']
 		}
 		def dividendGraph():
 			dividendPlotData=[]
 			for day in self.totalDividendsDict.keys():
-				for _ in range(int(multiplierV2)):
+				for _ in range(int(multiplierV2+1)):
 					dividendPlotData.append(self.totalDividendsDict[day])
 			return dividendPlotData
 
@@ -109,14 +109,18 @@ class Portfolio:
 		self.plt.plot(loss,linewidth=2,color=cStyles[style][1],label='Loss')
 		#_,ax=self.plt.subplots()
 		self.plt.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='on', labelleft='on')
-		self.plt.legend()
 		multiplierV2=len(profit)/len(list(self.totalPortfolio.keys()))
 		showMonths()
 		showYears()
 		dividends=dividendGraph()
-		dividendsX=[0 for v in range(len(dividends))]
-		#self.plt.fill_between(dividendsX,dividends)
-		#self.plt.plot(dividends,alpha=0.2, color='white')
+		dividendsX=np.arange(0,len(dividends)-32,1)
+		divPillow=[normal[i]-dividends[i] for i in range(len(profit))]
+		normal[0]=0
+		divPillow[0]=0
+		
+		self.plt.fill_between(dividendsX,normal,divPillow,color='white',alpha=0.05)
+		self.plt.plot(divPillow,alpha=0.3, color='white',label='Dividends')
+		self.plt.legend()
 		self.plt.show()
 			
 	def loadOrders(self):
@@ -220,7 +224,7 @@ class Portfolio:
 				try:
 					data=requests.get(f'https://api.worldtradingdata.com/api/v1/history?symbol={stockName}.L&sort=newest&api_token={apiKey}').json()['history']
 					return data
-				except ConnectionError:
+				except :
 					print('Connection error')
 			
 			path=os.path.join(os.path.dirname(__file__),f"pickle/{stockName}.pickle")
@@ -231,12 +235,12 @@ class Portfolio:
 				pickle.dump(res,open(path,'wb'))
 				if todayUnixTime - os.path.getmtime(path) > 86400:
 					res=downloadFreshStockData()
-					#print(f"Old data for {stockName}, dowloaded new one")
+					print(f"Old data for {stockName}, dowloaded new one")
 					pickle.dump(res,open(path,'wb'))
 			except (FileNotFoundError):
 				#print(f"didnt find saved {stockName}")
 				res = downloadFreshStockData()
-				#print("Downloaded "+str(stockName))
+				print("Downloaded "+str(stockName))
 				pickle.dump(res,open(path,'wb'))
 			return res
 			
@@ -266,10 +270,6 @@ class Portfolio:
 				if day in self.dividendData[stockName]:
 					totalStockDividends+=self.dividendData[stockName][day]
 					self.db[stockName].dividendTotal+=totalStockDividends
-			#update amount
-			if self.depositsData:
-				#toBeFinished
-				pass
 			#count new base price
 			if day in self.ordersData[stockName]:
 				basePrice,amount=newBasePrice()

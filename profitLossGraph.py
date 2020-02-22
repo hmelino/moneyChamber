@@ -32,7 +32,7 @@ def optimizeData(list):
 	def countProfitLoss(nList):
 		profit=np.ma.masked_where(nList<0,nList)
 		loss=np.ma.masked_where(nList>0,nList)
-		return profit,loss
+		return profit,loss,nList
 		
 	#start of optimiseData function
 	minPart=dataRange(list)/100
