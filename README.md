@@ -5,9 +5,10 @@
 ## Why use moneyChamber ?
 While most stock portfolios looks like this:
 [![bad portfolio](https://i.ibb.co/t8bSQYY/Figure-2.png)]()
-The always going up trend looks amazing, makes you feel like since you started you made loads of money, but all you see are (mostly) your deposits. 
+The always going up trend looks amazing, right ?
+Looks like you made loads of money since starting. But sorry to disrupt this idea, all you see are (mostly) your deposits.
 
-Portfolios should look more like this:
+Portfolio graphs should look more like this:
 [![good portfolio](https://i.ibb.co/5Lgvfkb/Figure-1.png)]()
 Performance based only on price movement and received dividends.
 
