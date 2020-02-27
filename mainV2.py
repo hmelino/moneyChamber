@@ -19,7 +19,69 @@ class Portfolio:
 	profit=0
 	totalDividendsDict={}
 	
-	
+	def countYeld(self):
+		class MonthlyYeld:
+			def __init__(self,divIncome,total):
+				self.divIncome=round(divIncome,2)
+				self.total=round(total,2)
+				self.yeld=round((divIncome/total)*100,3)
+				
+		def nextMonth(date):
+			date-=datetime.timedelta(32)
+			return (datetime.datetime(date.year,date.month,today.day).date())
+		def getNewestDay():
+			d=list(self.totalPortfolio.keys())[-1]
+			return (datetime.datetime.strptime(d,'%Y-%m-%d')).date()
+		
+		newestDay=getNewestDay()
+		day=newestDay
+		divPay=[]
+		deposits=[]
+		yeld=[]
+		while day > self.oldestDay:
+			totalIncome=0
+			totalWorth=0
+			for s in self.db:
+				path=self.db[s].history
+				if day in path:
+					amount=path[day].amount
+					bPrice=path[day].basePrice
+					total=amount*bPrice
+					totalIncome+=(total*self.db[s].yeld)
+					totalWorth+=total
+			o=MonthlyYeld(totalIncome,totalWorth)
+			print(day,o.divIncome,o.total,o.yeld)
+			day=nextMonth(day)
+		
+		
+		
+			
+	def countYearlyDivYelds(self):
+		def oldestNewestDay():
+			newestDay=list(path.keys())[-1]
+			yearAgo=newestDay-datetime.timedelta(365)
+			if yearAgo not in path:
+				yearAgo=self.db[s].date
+			return yearAgo,newestDay
+			
+		for s in self.db:
+			path=self.db[s].history
+			yearAgo,newestDay=oldestNewestDay()
+			processedDay=yearAgo
+			dividend=0
+			totalYeld=0
+			while processedDay != newestDay:
+				stringDay=strDay(processedDay)
+				if stringDay in self.dividendData[s]:
+					dividend=self.dividendData[s][stringDay]
+					yeld=dividend/(path[processedDay].amount*path[processedDay].basePrice)
+					totalYeld+=yeld
+				processedDay+=datetime.timedelta(1)
+			prettyYeld=round(totalYeld,3)
+			if self.db[s].etf == False:
+				prettyYeld/=100
+			self.db[s].yeld=prettyYeld
+		
 	def __init__(self):
 		self.loadStatement('statement.txt')
 		self.depositsData=self.loadDeposits()
@@ -30,6 +92,8 @@ class Portfolio:
 			self.addPrices(stock)
 		self.updateTotalPortfolio()
 		self.graph()
+		if self.dividendData:
+			self.countYearlyDivYelds()
 		self.profit=list(self.totalPortfolio.values())[-1]
 	def loadDeposits(self):
 		try:
@@ -52,6 +116,7 @@ class Portfolio:
 		from moneyChamber.profitLossGraph import optimizeData
 		import numpy as np
 		dayValues=[v for v in self.totalPortfolio.values()]
+		
 		profit,loss,normal=optimizeData(dayValues)
 		cStyles={'armyBlue':['#92C099','#C54E59','#304154'],
 		'darkGreen':['#92C099','#C54E59','#154F55']
@@ -113,11 +178,13 @@ class Portfolio:
 		showMonths()
 		showYears()
 		dividends=dividendGraph()
-		dividendsX=np.arange(0,len(dividends)-32,1)
+		
+		shortenDivX=len(dividends)-len(normal)
+		dividends=dividends[shortenDivX:]
+		dividendsX=np.arange(0,len(dividends),1)
 		divPillow=[normal[i]-dividends[i] for i in range(len(profit))]
 		normal[0]=0
 		divPillow[0]=0
-		
 		self.plt.fill_between(dividendsX,normal,divPillow,color='white',alpha=0.05)
 		self.plt.plot(divPillow,alpha=0.3, color='white',label='Dividends')
 		self.plt.legend()
@@ -152,14 +219,15 @@ class Portfolio:
 	def updateTotalPortfolio(self):
 		totalDeposits=0
 		totalDividends=0
-		for day in range((today-self.oldestDay.date()).days):
+		for day in range((today-self.oldestDay).days):
 			stringDay=strDay(self.oldestDay+datetime.timedelta(day))
+			processedDay=(self.oldestDay+datetime.timedelta(day))
 			totalForDay=0
 			if stringDay in self.depositsData:
 					totalDeposits+=self.depositsData[stringDay]
 			for stockName in self.db:
-				if stringDay in self.db[stockName].history:
-					totalForDay+=self.db[stockName].history[stringDay].profit
+				if processedDay in self.db[stockName].history:
+					totalForDay+=self.db[stockName].history[processedDay].profit
 				if stringDay in self.dividendData[stockName]:
 					totalDividends+=self.dividendData[stockName][stringDay]
 			self.totalPortfolio[stringDay]=totalForDay
@@ -169,18 +237,20 @@ class Portfolio:
 	class Stock:
 		__etfs__=['VUKE','VMID']
 		def __init__ (self,l):
+			
 			self.date=self.processDate(l)
 			self.buySell=l[3]
 			self.amount=float(l[4])
 			self.name=l[5]
 			self.price=float(l[6])
-			buyRange=(today-self.date.date()).days
-			self.history={strDay((self.date+datetime.timedelta(d)).date()):0 for d in range(buyRange)}
+			buyRange=(today-self.date).days
+			self.history={(self.date+datetime.timedelta(d)):0 for d in range(buyRange)}
+			#self.history={strDay((self.date+datetime.timedelta(d)).date()):0 for d in range(buyRange)}
 			self.updateETF()
 			self.dividendTotal=0
 
 		def processDate(self,l):
-			return datetime.datetime.strptime(l[2],'%Y.%m.%d %H:%M')
+			return datetime.datetime.strptime(l[2],'%Y.%m.%d %H:%M').date()
 
 		def updateETF(self):
 			if self.name in self.__etfs__:
@@ -247,7 +317,7 @@ class Portfolio:
 		def newBasePrice():
 			if day != firstDay:
 				bfAmount=amount
-				newAmount,newPrice=self.ordersData[stockName][day]
+				newAmount,newPrice=self.ordersData[stockName][stringDay]
 				bfPrice=basePrice
 				totalBefore=bfAmount*bfPrice
 				totalNew=newAmount*newPrice
@@ -259,23 +329,25 @@ class Portfolio:
 		totalStockDividends=0
 		priceData=oneTimeConnection()
 		stockPrice=0
-		firstDay=strDay(self.db[stockName].date)
-		amount=float(self.ordersData[stockName][firstDay][0])
-		basePrice=float(self.ordersData[stockName][firstDay][1])
+		firstDay=self.db[stockName].date
+		strFirstDay=strDay(firstDay)
+		amount=float(self.ordersData[stockName][strFirstDay][0])
+		basePrice=float(self.ordersData[stockName][strFirstDay][1])
 		etf=self.db[stockName].etf
 		for day in self.db[stockName].history.keys():
+			stringDay=strDay(day)
 
 			# add dividends 
 			if self.dividendData:
-				if day in self.dividendData[stockName]:
-					totalStockDividends+=self.dividendData[stockName][day]
+				if stringDay in self.dividendData[stockName]:
+					totalStockDividends+=self.dividendData[stockName][stringDay]
 					self.db[stockName].dividendTotal+=totalStockDividends
 			#count new base price
-			if day in self.ordersData[stockName]:
+			if stringDay in self.ordersData[stockName]:
 				basePrice,amount=newBasePrice()
 			#update stock price if markets were opened
-			if day in priceData:
-				stockPrice=float(priceData[day]['close'])
+			if stringDay in priceData:
+				stockPrice=float(priceData[stringDay]['close'])
 			self.db[stockName].history[day]=Day(basePrice,amount,stockPrice,etf,totalStockDividends,0)
 				
 
