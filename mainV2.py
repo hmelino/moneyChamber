@@ -28,7 +28,10 @@ class Portfolio:
 				
 		def nextMonth(date):
 			date-=datetime.timedelta(32)
-			return (datetime.datetime(date.year,date.month,today.day).date())
+			try:
+				return (datetime.datetime(date.year,date.month,today.day).date())
+			except ValueError:
+				return (datetime.datetime(date.year,date.month,today.day-3).date())
 		def getNewestDay():
 			d=list(self.totalPortfolio.keys())[-1]
 			return (datetime.datetime.strptime(d,'%Y-%m-%d')).date()
@@ -296,13 +299,13 @@ class Portfolio:
 					return data
 				except :
 					print('Connection error')
+					sys.exit()
 			
 			path=os.path.join(os.path.dirname(__file__),f"pickle/{stockName}.pickle")
 			if stockName == "BT":
 				stockName+=".A"
 			try:
 				res=pickle.load(open(path,'rb'))
-				pickle.dump(res,open(path,'wb'))
 				if todayUnixTime - os.path.getmtime(path) > 86400:
 					res=downloadFreshStockData()
 					print(f"Old data for {stockName}, dowloaded new one")
