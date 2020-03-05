@@ -50,6 +50,16 @@ import moneyChamber
 ```Python
 retirementPortfolio = moneyChamber.Portfolio()
 ```
+> Load statement,using path to .txt file as argument
+
+```Python
+retirementPortfolio.loadStatement('statement.txt')
+```
+> Plot the graph 
+
+```Python
+retirementPortfolio.graph()
+```
 >Output will be performance graph of your portfolio.
 
 

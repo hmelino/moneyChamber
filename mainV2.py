@@ -4,6 +4,7 @@ import requests
 import sys
 import os
 import time
+import json
 
 def strDay(day):
 	return datetime.datetime.strftime(day,'%Y-%m-%d')
@@ -18,7 +19,7 @@ class Portfolio:
 	db={}
 	profit=0
 	totalDividendsDict={}
-	
+		
 	def countYeld(self):
 		class MonthlyYeld:
 			def __init__(self,divIncome,total):
@@ -56,8 +57,6 @@ class Portfolio:
 			print(day,o.divIncome,o.total,o.yeld)
 			day=nextMonth(day)
 		
-		
-		
 			
 	def countYearlyDivYelds(self):
 		def oldestNewestDay():
@@ -84,42 +83,52 @@ class Portfolio:
 			if self.db[s].etf == False:
 				prettyYeld/=100
 			self.db[s].yeld=prettyYeld
-		
+	
 	def __init__(self):
-		self.loadStatement('statement.txt')
-		self.depositsData=self.loadDeposits()
-		self.ordersData=self.loadOrders()
-		self.dividendData=self.loadDividends()
-		self.oldestDay=min([self.db[stock].date for stock in self.db])
+		self.depositsData=[0]
+		self.dividendData=[0]
+		
+	def loadDeposits(self,path):
+		try:
+			with open(path,'r') as file:
+				self.depositsData=json.load(file)
+		except FileNotFoundError:
+			print(f'Cannot find file {path}')
+			self.dividendData={}
+			
+	def loadDividends(self,path):
+		try:
+			with open(path,'r') as file:
+				self.dividendData=json.load(file)
+		except FileNotFoundError:
+			print(f'Cannot find file {path}')
+			self.dividendData={}
+			
+	def depositGraph(self):
+		from moneyChamber.profitLossGraph import optimizeData
+		import numpy as np
+		
+		def addDeposits():
+			deposits=self.ordersData
+			for day in self.totalPortfolio:
+				total=self.totalPortfolio[day]
+				if day in deposits:
+					total+=deposits[day]
+				print(total)
+				
+	def finaliseData(self):
 		for stock in self.db:
 			self.addPrices(stock)
 		self.updateTotalPortfolio()
-		self.graph()
-		if self.dividendData:
-			self.countYearlyDivYelds()
-		self.profit=list(self.totalPortfolio.values())[-1]
-	def loadDeposits(self):
-		try:
-			from moneyChamber.deposits import data
-			return data
-		except ModuleNotFoundError:
-			print("Missing deposits.py file")
-			return {}
-
-	def loadDividends(self):
-		try:
-			#print("Loading dividends")
-			from moneyChamber.dividendPaid import data
-			return data
-		except ModuleNotFoundError:
-			print("Missing dividendPaid.py file")
-			return {}
 			
 	def graph(self,style='armyBlue'):
+		self.finaliseData()
+		if not self.db:
+			print('Load statement first')
+			sys.exit()
 		from moneyChamber.profitLossGraph import optimizeData
 		import numpy as np
 		dayValues=[v for v in self.totalPortfolio.values()]
-		
 		profit,loss,normal=optimizeData(dayValues)
 		cStyles={'armyBlue':['#92C099','#C54E59','#304154'],
 		'darkGreen':['#92C099','#C54E59','#154F55']
@@ -231,8 +240,9 @@ class Portfolio:
 			for stockName in self.db:
 				if processedDay in self.db[stockName].history:
 					totalForDay+=self.db[stockName].history[processedDay].profit
-				if stringDay in self.dividendData[stockName]:
-					totalDividends+=self.dividendData[stockName][stringDay]
+				if stockName in self.dividendData:
+					if stringDay in self.dividendData[stockName]:
+						totalDividends+=self.dividendData[stockName][stringDay]
 			self.totalPortfolio[stringDay]=totalForDay
 			self.totalDividendsDict[stringDay]=totalDividends
 
@@ -249,6 +259,7 @@ class Portfolio:
 			buyRange=(today-self.date).days
 			self.history={(self.date+datetime.timedelta(d)):0 for d in range(buyRange)}
 			#self.history={strDay((self.date+datetime.timedelta(d)).date()):0 for d in range(buyRange)}
+			
 			self.updateETF()
 			self.dividendTotal=0
 
@@ -263,11 +274,17 @@ class Portfolio:
 				self.price/=100
 
 	def loadStatement(self,url):
-
-		data=open(os.path.join(os.path.dirname(__file__),'statement.txt'),'r')
-		result = [l.split('\t') for l in data]
+		try:
+			data=open(os.path.join(os.path.dirname(__file__),url),'r')
+			result = [l.split('\t') for l in data]
+		except FileNotFoundError:
+			print(f'Cannot find {url}')
+			sys.exit()
+		self.ordersData=self.loadOrders()
 		for d in result:
 			self.db[d[5]]=self.Stock(d)
+		self.oldestDay=min([self.db[stock].date for stock in self.db])
+		
 
 	def addPrices(self,stockName):
 		class Day:
@@ -300,7 +317,6 @@ class Portfolio:
 				except :
 					print('Connection error')
 					sys.exit()
-			
 			path=os.path.join(os.path.dirname(__file__),f"pickle/{stockName}.pickle")
 			if stockName == "BT":
 				stockName+=".A"
@@ -341,7 +357,7 @@ class Portfolio:
 			stringDay=strDay(day)
 
 			# add dividends 
-			if self.dividendData:
+			if stockName in self.dividendData:
 				if stringDay in self.dividendData[stockName]:
 					totalStockDividends+=self.dividendData[stockName][stringDay]
 					self.db[stockName].dividendTotal+=totalStockDividends
