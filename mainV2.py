@@ -164,7 +164,6 @@ class Portfolio:
 				x=nYPositions[year]*multiplierV2
 				self.plt.axvline(x,color='white',alpha=0.5)
 				self.plt.annotate(year,xy=(x+200,y))
-				#ax.annotate
 
 		def prettyGraph():
 			bgColor=cStyles[style][2]
@@ -184,7 +183,6 @@ class Portfolio:
 		prettyGraph()
 		self.plt.plot(profit,linewidth=2,color=cStyles[style][0],label='Profit')
 		self.plt.plot(loss,linewidth=2,color=cStyles[style][1],label='Loss')
-		#_,ax=self.plt.subplots()
 		self.plt.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='on', labelleft='on')
 		multiplierV2=len(profit)/len(list(self.totalPortfolio.keys()))
 		showMonths()
@@ -201,33 +199,23 @@ class Portfolio:
 		self.plt.plot(divPillow,alpha=0.3, color='white',label='Dividends')
 		self.plt.legend()
 		self.plt.show()
-			
-	def loadOrders(self):
-		def createOrders():
-			""" Create orders data if orders.py is not provided """
-			print('Creating orders data')
-			d=self.db
-			data={d[s].name:{strDay(d[s].date):[d[s].amount,d[s].price]} for s in d}
+	
+	def createOrders(self):
+		""" Create orders data from statement """
+		d=self.db
+		data={d[s].name:{strDay(d[s].date):[d[s].amount,d[s].price]} for s in d}
 
-			#adjust prices for non ETF
-			for stock in data.keys():
-				etfs=self.Stock.__etfs__
-				if stock not in etfs:
-					for date in data[stock].keys():
-						secondPart=data[stock][date]
-						secondPart[1]*=100
-			return data
-
-		try:
-			from moneyChamber.orders import data
-			return data
-			
-		except ModuleNotFoundError:
-			return createOrders()
-			
-		except ImportError:
-			print('Create variable "data" inside of orders.py with all stock orders')
-			
+		#adjust prices for non ETF
+		for stock in data.keys():
+			etfs=self.Stock.__etfs__
+			if stock not in etfs:
+				for date in data[stock].keys():
+					secondPart=data[stock][date]
+					secondPart[1]*=100
+		return data
+	
+	#def loadOrders(self):
+		
 	def updateTotalPortfolio(self):
 		totalDeposits=0
 		totalDividends=0
@@ -258,7 +246,6 @@ class Portfolio:
 			self.price=float(l[6])
 			buyRange=(today-self.date).days
 			self.history={(self.date+datetime.timedelta(d)):0 for d in range(buyRange)}
-			#self.history={strDay((self.date+datetime.timedelta(d)).date()):0 for d in range(buyRange)}
 			
 			self.updateETF()
 			self.dividendTotal=0
@@ -280,9 +267,11 @@ class Portfolio:
 		except FileNotFoundError:
 			print(f'Cannot find {url}')
 			sys.exit()
-		self.ordersData=self.loadOrders()
+		data
+		
 		for d in result:
 			self.db[d[5]]=self.Stock(d)
+		self.ordersData=self.createOrders()
 		self.oldestDay=min([self.db[stock].date for stock in self.db])
 		
 
@@ -327,7 +316,6 @@ class Portfolio:
 					print(f"Old data for {stockName}, dowloaded new one")
 					pickle.dump(res,open(path,'wb'))
 			except (FileNotFoundError):
-				#print(f"didnt find saved {stockName}")
 				res = downloadFreshStockData()
 				print("Downloaded "+str(stockName))
 				pickle.dump(res,open(path,'wb'))
