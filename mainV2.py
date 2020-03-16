@@ -177,7 +177,7 @@ class Portfolio:
 			self.plt.rcParams['xtick.color']=bgColor
 			self.plt.rcParams['ytick.color']='white'
 			self.plt.rcParams['patch.edgecolor']='red'
-			self.plt.rcParams['legend.loc']='upper left'
+			self.plt.rcParams['legend.loc']='lower left'
 			self.plt.rcParams.update
 		
 		prettyGraph()
@@ -214,7 +214,9 @@ class Portfolio:
 					secondPart[1]*=100
 		return data
 	
-	#def loadOrders(self):
+	def loadOrders(self,path):
+		with open(path,'r') as file:
+			self.ordersData=json.load(file)
 		
 	def updateTotalPortfolio(self):
 		totalDeposits=0

@@ -7,3 +7,5 @@ secret.txt
 __pycache__
 .vscode
 /deposits.py
+/orders.txt
+statement.txt

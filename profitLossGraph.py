@@ -1,33 +1,17 @@
-def optimizeData(list):
+def optimizeData(l):
 
 	import numpy as np
-	def antiAlias(l,steps):
-		#adds x amount of midpoints/steps into list
-		newList=[]
-		for n in range(len(l)):
-			newList.append(l[n])
-			try:
-				for t in range(1,steps+1):
-					d=(l[n+1]-l[n])/(steps+1)
-					newList.append(l[n]+d*t)
-			except IndexError:
-				pass
-		return newList
-		
-	def biggestDataDifference(list):
-		#find longest line in plot
-		biggestDifference=0
-		for d in range(len(list)):
-			try:
-				difference=abs(list[d]-list[d-1])
-				if biggestDifference<difference:
-					biggestDifference=difference
-			except IndexError:
-				pass
-		return biggestDifference
 	
-	def dataRange(list):
-		return max(list)-min(list)
+	def antiAliasV2(l,steps):
+		file=[np.linspace(start=l[v],stop=l[v-1],num=steps) for v in range(len(l))]
+		return [x for lst in file for x in lst][steps:]
+		
+	def biggestDataDifferenceV2(l):
+		gaps=[abs(l[v]-l[v-1]) for v in range(len(l))]
+		return max(gaps[1:])
+		
+	def dataRange(l):
+		return max(l)-min(l)
 		
 	def countProfitLoss(nList):
 		profit=np.ma.masked_where(nList<0,nList)
@@ -35,8 +19,9 @@ def optimizeData(list):
 		return profit,loss,nList
 		
 	#start of optimiseData function
-	minPart=dataRange(list)/100
-	multiplier=int(biggestDataDifference(list)/minPart)
-	newList=antiAlias(list,multiplier)
-	numpyList=np.array(newList)
+	minPart=dataRange(l)/100
+	multiplierV2=int(biggestDataDifferenceV2(l)/10)
+	
+	newOne=antiAliasV2(l,multiplierV2)
+	numpyList=np.array(newOne)
 	return countProfitLoss(numpyList)
