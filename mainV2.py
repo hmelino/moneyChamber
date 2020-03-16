@@ -19,6 +19,9 @@ class Portfolio:
 	db={}
 	profit=0
 	totalDividendsDict={}
+	
+	def addApiKey(self,key):
+		self.apiKey=key
 		
 	def countYeld(self):
 		class MonthlyYeld:
@@ -291,13 +294,12 @@ class Portfolio:
 				self.totalDeposits=deposits
 		
 		def oneTimeConnection(stockName=stockName):
+			
 			def importApiKey():
-				try:
-					from moneyChamber.sensData import apiKey
-					return apiKey
-				except ModuleNotFoundError:
-					print('Please create sensData.py file inside MoneyChamber folder and create variable apiKey="your_worldtradingdata.com_api_key" inside sensData.py')
-					sys.exit()
+				if self.apiKey:
+					return self.apiKey
+				print('Import Api key using importApiKey("your_worldtradingdata.com_api_key") method ')
+				sys.exit()
 
 			apiKey=importApiKey()
 			todayUnixTime=time.time()
