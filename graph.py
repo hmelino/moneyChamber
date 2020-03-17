@@ -80,7 +80,7 @@ def showGraphV2(self):
 			dividends=dividendGraph()
 			dividendsX=np.arange(0,len(dividends))
 			divShadow=[normal[iN]-dividends[iN] for iN in range(len(profit))]
-			plt.plot(divShadow, color='white',alpha=0.3)
+			plt.plot(divShadow, color='white',alpha=0.1)
 			plt.fill_between(dividendsX,normal,divShadow,color='white', alpha=0.05,label='Dividends')
 		plt.legend()
 		plt.show()

@@ -76,6 +76,7 @@ retirementPortfolio = moneyChamber.Portfolio('statement.txt')
 retirementPortfolio.apiKey='your_own_world_trading_data_api_key'
 ```
 > **Optionally** you can load your paid [dividends](#dividends-file) file.
+> ![Dividends](https://i.ibb.co/WH3mYPG/ezgif-7-5d4ddc7ad5ef.gif)]
 ```Python
 retirementPortfolio.loadDividends('dividends.txt')
 ```

@@ -34,11 +34,17 @@ class Portfolio:
 	def showGraph(self):
 		from moneyChamber.graph import showGraphV2
 		showGraphV2(self)
+
+	def showDepositGraph(self):
+		from moneyChamber.depositGraph import showDepositGraph
+		showDepositGraph(self)
 		
 	def __init__(self,statementPath):
+		self.workingDirectory=workingDirectory=os.getcwd()
 		self.depositsData=[0]
 		self.dividendData=[0]
 		self.loadStatement(statementPath)
+		
 		
 	def countYeld(self):
 		class MonthlyYeld:
@@ -131,7 +137,16 @@ class Portfolio:
 					secondPart[1]*=100
 		return data
 	
-	def loadOrders(self,path):
+	def loadOrders(self,filename):
+		path=f'{self.workingDirectory}\\{filename}'
+		try:
+			with open(path,'r') as file:
+				self.ordersData=json.load(file)
+		except FileNotFoundError:
+			print(f'Cannot find {filename}')
+			print(f'Your working directory is {os.getcwd()}')
+			sys.exit()
+		
 		with open(path,'r') as file:
 			self.ordersData=json.load(file)
 		
@@ -180,11 +195,14 @@ class Portfolio:
 
 	def loadStatement(self,url):
 		def loadStatementFile(url):
+			
+			path=f'{self.workingDirectory}\\{url}'
 			try:
-				data=open(os.path.join(os.path.dirname(__file__),url),'r')
+				data=open(path,'r')
 				return [l.split('\t') for l in data]
 			except FileNotFoundError:
 				print(f'Cannot find {url}')
+				print(f'Your working directory is {os.getcwd()}')
 				sys.exit()
 
 		statementFile=loadStatementFile(url)
