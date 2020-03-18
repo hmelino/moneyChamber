@@ -21,6 +21,12 @@ class Portfolio:
 
 	def strDay(self,day):
 		return datetime.datetime.strftime(day,'%Y-%m-%d')
+		
+	def fullCWD(self):
+		cwd=os.getcwd()
+		if '//' in cwd:
+			return f'{cwd}//'
+		return f'{cwd}/'
 
 	def finaliseData(self):
 		from moneyChamber.prices import addPrices
@@ -40,7 +46,7 @@ class Portfolio:
 		showDepositGraph(self)
 		
 	def __init__(self,statementPath):
-		self.workingDirectory=workingDirectory=os.getcwd()
+		self.cwd=self.fullCWD()
 		self.depositsData=[0]
 		self.dividendData=[0]
 		self.loadStatement(statementPath)
@@ -107,7 +113,8 @@ class Portfolio:
 				prettyYeld/=100
 			self.db[s].yeld=prettyYeld
 		
-	def loadDeposits(self,path):
+	def loadDeposits(self,filename):
+		path=self.cwd+filename
 		try:
 			with open(path,'r') as file:
 				self.depositsData=json.load(file)
@@ -115,7 +122,8 @@ class Portfolio:
 			print(f'Cannot find file {path}')
 			self.dividendData={}
 			
-	def loadDividends(self,path):
+	def loadDividends(self,filename):
+		path=self.cwd+filename
 		try:
 			with open(path,'r') as file:
 				self.dividendData=json.load(file)
@@ -138,7 +146,7 @@ class Portfolio:
 		return data
 	
 	def loadOrders(self,filename):
-		path=f'{self.workingDirectory}\\{filename}'
+		path=self.cwd+filename
 		try:
 			with open(path,'r') as file:
 				self.ordersData=json.load(file)
@@ -146,9 +154,6 @@ class Portfolio:
 			print(f'Cannot find {filename}')
 			print(f'Your working directory is {os.getcwd()}')
 			sys.exit()
-		
-		with open(path,'r') as file:
-			self.ordersData=json.load(file)
 		
 	def updateDayTotals(self):
 		totalDeposits=0
@@ -193,10 +198,10 @@ class Portfolio:
 				self.etf=False
 				self.price/=100
 
-	def loadStatement(self,url):
-		def loadStatementFile(url):
+	def loadStatement(self,filename):
+		def loadStatementFile(filename):
 			
-			path=f'{self.workingDirectory}\\{url}'
+			path=self.cwd+filename
 			try:
 				data=open(path,'r')
 				return [l.split('\t') for l in data]
@@ -205,7 +210,7 @@ class Portfolio:
 				print(f'Your working directory is {os.getcwd()}')
 				sys.exit()
 
-		statementFile=loadStatementFile(url)
+		statementFile=loadStatementFile(filename)
 		# process each line in statement as separate stock 
 		for d in statementFile:
 			self.db[d[5]]=self.Stock(d)
